@@ -1,6 +1,5 @@
 @extends('admin.layout')
 
-<<<<<<< HEAD
 @section('title','Quản lý hóa đơn')
 @section('page_title','Hóa đơn')
 
@@ -45,7 +44,6 @@
 
 <div class="max-w-[1400px] mx-auto">
 
-<<<<<<< HEAD
 @if(session('success'))
 <div class="mb-6 px-5 py-4 rounded-xl bg-emerald-50 text-emerald-700 font-bold">
     ✓ {{ session('success') }}

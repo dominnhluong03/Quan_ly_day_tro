@@ -28,20 +28,8 @@ use App\Http\Controllers\Tenant\TenantContractController;
 use App\Http\Controllers\Tenant\TenantBillController;
 use App\Http\Controllers\Tenant\TenantPaymentController;
 use App\Http\Controllers\Tenant\TenantIssueController;
-<<<<<<< HEAD
 
-/*
-|--------------------------------------------------------------------------
-| FORGOT/RESET PASSWORD (NEW)
-=======
 use App\Http\Controllers\Tenant\TenantRoomController;
-
-/*
-|--------------------------------------------------------------------------
-| FORGOT/RESET PASSWORD
->>>>>>> feb1f02 (first commit)
-|--------------------------------------------------------------------------
-*/
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 
@@ -72,12 +60,10 @@ Route::post('/logout', function () {
 
 /*
 |--------------------------------------------------------------------------
-<<<<<<< HEAD
 | FORGOT / RESET PASSWORD ROUTES (NEW)
 |--------------------------------------------------------------------------
 | - /forgot-password: nhập email -> gửi link reset
 | - /reset-password/{token}: đặt mật khẩu mới
-=======
 | FORGOT / RESET PASSWORD
 |--------------------------------------------------------------------------
 >>>>>>> feb1f02 (first commit)
@@ -114,23 +100,18 @@ Route::middleware(['auth', 'role:admin'])
 
         // Buildings
         Route::resource('buildings', BuildingController::class)->only(['index', 'store', 'destroy']);
-
-<<<<<<< HEAD
         /**
          * ROOMS
          * ✅ Cần có edit + update để trang sửa chạy được
          * Bạn đang dùng modal để thêm => không cần create/show
          */
         Route::resource('rooms', RoomController::class)->except(['create', 'show']); // index, store, edit, update, destroy
-=======
+
         // Rooms
         Route::resource('rooms', RoomController::class)->except(['create', 'show']);
->>>>>>> feb1f02 (first commit)
 
         // Tenants
         Route::resource('tenants', TenantController::class)->except(['create', 'show']);
-
-<<<<<<< HEAD
         /**
          * CONTRACTS
          * (Bạn đang dùng modal tạo) => không cần create/show
@@ -157,8 +138,6 @@ Route::middleware(['auth', 'role:admin'])
         Route::get('payments/{payment}/view', [PaymentController::class, 'viewFile'])->name('payments.view');
 
         Route::get('payments/{payment}/download', [PaymentController::class, 'downloadFile'])->name('payments.download');
-
-=======
         // Contracts
 
         Route::resource('contracts', ContractController::class)->only(['index', 'store', 'edit', 'update', 'destroy']);
@@ -174,7 +153,6 @@ Route::middleware(['auth', 'role:admin'])
         Route::get('payments', [PaymentController::class, 'index'])->name('payments.index');
         Route::get('payments/{payment}/view', [PaymentController::class, 'viewFile'])->name('payments.view');
         Route::get('payments/{payment}/download', [PaymentController::class, 'downloadFile'])->name('payments.download');
->>>>>>> feb1f02 (first commit)
         Route::post('payments/{payment}/approve', [PaymentController::class, 'approve'])->name('payments.approve');
         Route::post('payments/{payment}/reject', [PaymentController::class, 'reject'])->name('payments.reject');
 
@@ -183,11 +161,8 @@ Route::middleware(['auth', 'role:admin'])
         Route::post('issues/{issue}/fixing', [IssueController::class, 'markFixing'])->name('issues.fixing');
         Route::post('issues/{issue}/resolved', [IssueController::class, 'markResolved'])->name('issues.resolved');
 
-<<<<<<< HEAD
         // password (admin change password inside admin)
-=======
         // Password
->>>>>>> feb1f02 (first commit)
         Route::get('/password', [AdminPasswordController::class, 'index'])->name('password.index');
         Route::post('/password', [AdminPasswordController::class, 'update'])->name('password.update');
     });
@@ -201,8 +176,6 @@ Route::middleware(['auth', 'role:tenant'])
     ->prefix('tenant')
     ->name('tenant.')
     ->group(function () {
-
-<<<<<<< HEAD
         // ✅ Contracts (Tenant)
         Route::get('/contracts', [TenantContractController::class, 'index'])->name('contracts.index');
         Route::get('/contracts/{contract}/view', [TenantContractController::class, 'view'])->name('contracts.view');
@@ -212,7 +185,6 @@ Route::middleware(['auth', 'role:tenant'])
 
         // Profile
         Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index');
-=======
         // Dashboard
         Route::get('/dashboard', [TenantDashboardController::class, 'index'])->name('dashboard');
 
@@ -221,15 +193,11 @@ Route::middleware(['auth', 'role:tenant'])
         // Profile
         Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index');
         Route::post('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
->>>>>>> feb1f02 (first commit)
-
         // Password
         Route::get('/password', [PasswordController::class, 'index'])->name('password.index');
         Route::post('/password', [PasswordController::class, 'update'])->name('password.update.index');
 
-<<<<<<< HEAD
         // ✅ Bills (Tenant)
-=======
         // Contracts
         Route::get('/contracts', [TenantContractController::class, 'index'])->name('contracts.index');
         Route::get('/contracts/{contract}/view', [TenantContractController::class, 'view'])->name('contracts.view');
@@ -237,7 +205,6 @@ Route::middleware(['auth', 'role:tenant'])
         ->name('contracts.renew');
 
         // Bills
->>>>>>> feb1f02 (first commit)
         Route::get('/bills', [TenantBillController::class, 'index'])->name('bills.index');
         Route::get('/bills/{invoice}/view', [TenantBillController::class, 'view'])->name('bills.view');
         Route::get('/bills/{invoice}/download', [TenantBillController::class, 'download'])->name('bills.download');

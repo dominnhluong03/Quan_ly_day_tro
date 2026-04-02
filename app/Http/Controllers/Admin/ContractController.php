@@ -6,10 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Barryvdh\DomPDF\Facade\Pdf;
-<<<<<<< HEAD
-=======
 use Carbon\Carbon;
->>>>>>> feb1f02 (first commit)
 
 use App\Models\Contract;
 use App\Models\Room;
@@ -17,7 +14,6 @@ use App\Models\Tenant;
 
 class ContractController extends Controller
 {
-<<<<<<< HEAD
     public function index()
     {
         $contracts = Contract::with(['tenant.user','room'])
@@ -25,7 +21,7 @@ class ContractController extends Controller
             ->get();
 
         /*
-        =====================================================
+    ==============================================
         1️⃣ LỌC TENANT
         Chỉ lấy tenant CHƯA có hợp đồng active
         =====================================================
@@ -33,7 +29,6 @@ class ContractController extends Controller
         $tenants = Tenant::with('user')
             ->whereDoesntHave('contracts', function($q){
                 $q->where('status','active');
-=======
     /**
      * Tự động cập nhật hợp đồng hết hạn
      */
@@ -91,12 +86,10 @@ class ContractController extends Controller
         $tenants = Tenant::with('user')
             ->whereDoesntHave('contracts', function ($q) {
                 $q->where('status', 'active');
->>>>>>> feb1f02 (first commit)
             })
             ->orderByDesc('id')
             ->get();
 
-<<<<<<< HEAD
         /*
         =====================================================
         2️⃣ LỌC ROOM
@@ -115,7 +108,6 @@ class ContractController extends Controller
             ->values(); // reset key
 
         return view('admin.contracts.index', compact('contracts','rooms','tenants'));
-=======
         // Room còn chỗ + load hợp đồng active hiện tại để preview trong modal
         $rooms = Room::with([
                 'contracts' => function ($q) {
@@ -136,7 +128,6 @@ class ContractController extends Controller
             ->values();
 
         return view('admin.contracts.index', compact('contracts', 'rooms', 'tenants'));
->>>>>>> feb1f02 (first commit)
     }
 
     public function store(Request $request)
@@ -154,7 +145,6 @@ class ContractController extends Controller
 
         $room = Room::findOrFail($data['room_id']);
 
-<<<<<<< HEAD
         $tenantIds = is_array($request->tenant_id) ? $request->tenant_id : [$request->tenant_id];
         $tenantIds = array_values(array_unique(array_filter($tenantIds)));
 
@@ -164,7 +154,7 @@ class ContractController extends Controller
         if ($activeCount + count($tenantIds) > $maxPeople) {
             return back()->withInput()->withErrors([
                 'room_id' => "Phòng {$room->room_code} tối đa {$maxPeople} người."
-=======
+
         $tenantIds = is_array($request->tenant_id)
             ? $request->tenant_id
             : [$request->tenant_id];
@@ -180,23 +170,17 @@ class ContractController extends Controller
         if ($activeCount + count($tenantIds) > $maxPeople) {
             return back()->withInput()->withErrors([
                 'room_id' => "Phòng {$room->room_code} tối đa {$maxPeople} người.",
->>>>>>> feb1f02 (first commit)
             ]);
         }
 
         DB::beginTransaction();
-<<<<<<< HEAD
-=======
 
->>>>>>> feb1f02 (first commit)
         try {
             $created = [];
 
             foreach ($tenantIds as $tenantId) {
-<<<<<<< HEAD
 
-=======
->>>>>>> feb1f02 (first commit)
+
                 $contract = Contract::create([
                     'room_id'        => $room->id,
                     'tenant_id'      => $tenantId,
@@ -209,7 +193,6 @@ class ContractController extends Controller
                     'service_note'   => $data['service_note'] ?? null,
                 ]);
 
-<<<<<<< HEAD
                 // ✅ tenant -> renting
                 $contract->tenant->update(['status' => 'renting']);
 
@@ -229,7 +212,7 @@ class ContractController extends Controller
                 $pdf->save($folder.'/'.$fileName);
 
                 $contract->update(['contract_file' => 'contracts/'.$fileName]);
-=======
+
                 // Nếu tạo hợp đồng mà end_date đã nhỏ hơn hôm nay => expired
                 if ($contract->end_date && Carbon::parse($contract->end_date)->lt(Carbon::today())) {
                     $contract->update([
@@ -269,12 +252,11 @@ class ContractController extends Controller
                 $contract->update([
                     'contract_file' => 'contracts/' . $fileName,
                 ]);
->>>>>>> feb1f02 (first commit)
 
                 $created[] = $contract->id;
             }
 
-<<<<<<< HEAD
+
             DB::commit();
 
             return redirect()->route('admin.contracts.index')
@@ -283,7 +265,7 @@ class ContractController extends Controller
         } catch (\Throwable $e) {
             DB::rollBack();
             return back()->withErrors(['error'=>$e->getMessage()]);
-=======
+
             $this->refreshExpiredContracts();
 
             DB::commit();
@@ -297,24 +279,21 @@ class ContractController extends Controller
             return back()->withInput()->withErrors([
                 'error' => $e->getMessage(),
             ]);
->>>>>>> feb1f02 (first commit)
         }
     }
 
     public function edit(Contract $contract)
     {
-<<<<<<< HEAD
+
         $contract->load(['tenant.user','room']);
         $rooms = Room::orderBy('room_code')->get();
         return view('admin.contracts.edit', compact('contract','rooms'));
-=======
         $this->refreshExpiredContracts();
 
         $contract->load(['tenant.user', 'room']);
         $rooms = Room::orderBy('room_code')->get();
 
         return view('admin.contracts.edit', compact('contract', 'rooms'));
->>>>>>> feb1f02 (first commit)
     }
 
     public function update(Request $request, Contract $contract)
@@ -332,7 +311,7 @@ class ContractController extends Controller
         ]);
 
         DB::beginTransaction();
-<<<<<<< HEAD
+
         try {
             $oldRoomId = (int)$contract->room_id;
             $oldTenantId = (int)$contract->tenant_id;
@@ -352,7 +331,6 @@ class ContractController extends Controller
             }
 
             // ✅ room status cho phòng hiện tại
-=======
 
         try {
             $oldRoomId = (int) $contract->room_id;
@@ -383,12 +361,11 @@ class ContractController extends Controller
             }
 
             // room status cho phòng hiện tại
->>>>>>> feb1f02 (first commit)
             $newRoom = Room::findOrFail($contract->room_id);
 
             if ($data['status'] === 'active') {
                 if ($newRoom->status !== 'maintenance') {
-<<<<<<< HEAD
+
                     $newRoom->update(['status'=>'occupied']);
                 }
             } else {
@@ -405,7 +382,6 @@ class ContractController extends Controller
                     $activeInOldRoom = Contract::where('room_id',$oldRoomId)->where('status','active')->count();
                     if ($activeInOldRoom == 0) {
                         $oldRoom->update(['status'=>'empty']);
-=======
                     $newRoom->update([
                         'status' => 'occupied',
                     ]);
@@ -435,12 +411,11 @@ class ContractController extends Controller
                         $oldRoom->update([
                             'status' => 'empty',
                         ]);
->>>>>>> feb1f02 (first commit)
                     }
                 }
             }
 
-<<<<<<< HEAD
+
             // ✅ nếu đổi tenant, tenant cũ có còn active không -> free
             if ($oldTenantId !== (int)$contract->tenant_id) {
                 $stillActiveOldTenant = Contract::where('tenant_id',$oldTenantId)->where('status','active')->count();
@@ -469,7 +444,6 @@ class ContractController extends Controller
         } catch (\Throwable $e) {
             DB::rollBack();
             return back()->withErrors(['error'=>$e->getMessage()]);
-=======
             // Nếu đổi tenant
             if ($oldTenantId !== (int) $contract->tenant_id) {
                 $stillActiveOldTenant = Contract::where('tenant_id', $oldTenantId)
@@ -515,13 +489,11 @@ class ContractController extends Controller
             return back()->withInput()->withErrors([
                 'error' => $e->getMessage(),
             ]);
->>>>>>> feb1f02 (first commit)
         }
     }
 
     public function view(Contract $contract)
     {
-<<<<<<< HEAD
         if (!$contract->contract_file) abort(404);
         $path = public_path($contract->contract_file);
         if (!file_exists($path)) abort(404);
@@ -529,7 +501,6 @@ class ContractController extends Controller
         return response()->file($path,[
             'Content-Type'=>'application/pdf',
             'Content-Disposition'=>'inline; filename="'.basename($path).'"'
-=======
         $this->refreshExpiredContracts();
 
         if (! $contract->contract_file) {
@@ -545,13 +516,11 @@ class ContractController extends Controller
         return response()->file($path, [
             'Content-Type' => 'application/pdf',
             'Content-Disposition' => 'inline; filename="' . basename($path) . '"',
->>>>>>> feb1f02 (first commit)
         ]);
     }
 
     public function destroy(Contract $contract)
     {
-<<<<<<< HEAD
         DB::beginTransaction();
         try {
             $tenantId = (int)$contract->tenant_id;
@@ -571,7 +540,6 @@ class ContractController extends Controller
                 $stillActiveRoom = Contract::where('room_id',$roomId)->where('status','active')->count();
                 if ($stillActiveRoom == 0) {
                     $room->update(['status'=>'empty']);
-=======
         $this->refreshExpiredContracts();
 
         DB::beginTransaction();
@@ -603,18 +571,15 @@ class ContractController extends Controller
                     $room->update([
                         'status' => 'empty',
                     ]);
->>>>>>> feb1f02 (first commit)
                 }
             }
 
             DB::commit();
-<<<<<<< HEAD
             return back()->with('success','Đã xóa hợp đồng');
 
         } catch (\Throwable $e) {
             DB::rollBack();
             return back()->withErrors(['error'=>$e->getMessage()]);
-=======
 
             return back()->with('success', 'Đã xóa hợp đồng');
         } catch (\Throwable $e) {
@@ -623,7 +588,6 @@ class ContractController extends Controller
             return back()->withErrors([
                 'error' => $e->getMessage(),
             ]);
->>>>>>> feb1f02 (first commit)
         }
     }
 }

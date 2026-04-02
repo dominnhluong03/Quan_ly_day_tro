@@ -7,7 +7,7 @@
 
 <style>
     @keyframes modalSpring {
-<<<<<<< HEAD
+
         0% { opacity: 0; transform: scale(0.9) translateY(20px); }
         100% { opacity: 1; transform: scale(1) translateY(0); }
     }
@@ -23,7 +23,7 @@
         background: #e2e8f0;
         border-radius: 10px;
     }
-=======
+
         0% { opacity: 0; transform: scale(0.95) translateY(10px); }
         100% { opacity: 1; transform: scale(1) translateY(0); }
     }
@@ -41,12 +41,11 @@
         to { opacity: 1; transform: translateY(0); }
     }
     .animate-fadeIn { animation: fadeIn 0.45s ease-out; }
->>>>>>> feb1f02 (first commit)
 </style>
 
 <div class="max-w-[1400px] mx-auto">
 
-<<<<<<< HEAD
+
     {{-- ALERT --}}
     @if(session('success'))
     <div class="mb-6 flex items-center gap-3 px-5 py-4 rounded-2xl bg-emerald-50 border border-emerald-100 text-emerald-700 shadow-sm animate-fadeIn">
@@ -60,7 +59,7 @@
         <div>
             <h2 class="text-2xl font-black text-slate-800 tracking-tight">Quản lý hợp đồng</h2>
             <p class="text-slate-500 text-sm font-medium mt-1">Pháp lý và thời hạn thuê phòng</p>
-=======
+
     @if(session('success'))
         <div class="mb-6 px-5 py-4 rounded-xl bg-emerald-50 text-emerald-700 font-bold border border-emerald-100 animate-fadeIn">
             ✓ {{ session('success') }}
@@ -77,12 +76,10 @@
         <div>
             <h2 class="text-2xl font-black text-slate-900">Quản lý hợp đồng</h2>
             <p class="text-slate-500 text-sm">Pháp lý và thời hạn thuê phòng</p>
->>>>>>> feb1f02 (first commit)
         </div>
 
         <div class="flex items-center gap-3">
             <div class="relative hidden lg:block">
-<<<<<<< HEAD
                 <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">🔍</span>
                 <input type="text" id="tableSearch" placeholder="Tìm tên khách, mã phòng..." 
                     class="pl-11 pr-4 py-2.5 w-64 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus-ring transition-all outline-none">
@@ -90,19 +87,16 @@
             <button onclick="openModal()"
                 class="flex items-center gap-2 px-6 py-3 bg-slate-900 text-white rounded-xl font-bold text-sm shadow-xl shadow-slate-200 hover:bg-indigo-600 hover:shadow-indigo-200 transition-all active:scale-95">
                 <span>➕</span> Thêm hợp đồng
-=======
                 <input type="text" id="tableSearch" placeholder="Tìm tên khách, mã phòng..."
                        class="pl-4 pr-4 py-2.5 w-64 bg-white border rounded-xl text-sm focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all">
             </div>
             <button onclick="openModal()"
                     class="px-6 py-3 bg-slate-900 text-white rounded-xl font-bold hover:bg-indigo-600 transition shadow-lg shadow-slate-200">
                 ➕ Thêm hợp đồng
->>>>>>> feb1f02 (first commit)
             </button>
         </div>
     </div>
 
-<<<<<<< HEAD
     {{-- STATS CARDS --}}
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
         <div class="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm transition-transform hover:scale-[1.02]">
@@ -211,7 +205,6 @@
                             <p class="text-slate-400 font-bold">🚫 Chưa có dữ liệu hợp đồng</p>
                         </td>
                     </tr>
-=======
     <div class="grid grid-cols-2 gap-6 mb-8">
         <div class="bg-white p-6 rounded-xl border text-center">
             <p class="text-slate-400 text-xs font-bold uppercase tracking-wider">Tổng hợp đồng</p>
@@ -340,7 +333,6 @@
                         <tr>
                             <td colspan="6" class="py-10 text-center text-slate-400">Chưa có dữ liệu hợp đồng</td>
                         </tr>
->>>>>>> feb1f02 (first commit)
                     @endforelse
                 </tbody>
             </table>
@@ -348,7 +340,7 @@
     </div>
 </div>
 
-<<<<<<< HEAD
+
 {{-- MODAL THÊM HỢP ĐỒNG --}}
 <div id="modal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm hidden items-center justify-center z-[100] p-4">
     <div class="bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl animate-modal overflow-hidden">
@@ -367,7 +359,6 @@
                     <div class="space-y-2">
                         <label class="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">Khách thuê</label>
                         <select name="tenant_id" required class="w-full px-5 py-3.5 bg-slate-50 border-none rounded-2xl font-bold text-slate-700 focus-ring transition-all outline-none">
-=======
 <div id="modal" class="fixed inset-0 bg-black/40 hidden items-center justify-center z-[300] p-4">
     <div class="bg-white w-full max-w-2xl rounded-xl animate-modal overflow-hidden max-h-[95vh] flex flex-col shadow-2xl">
 
@@ -389,14 +380,12 @@
                         <label class="text-xs font-bold text-slate-500 mb-1 block">Khách thuê</label>
                         <select name="tenant_id" required
                                 class="w-full p-3 bg-slate-50 rounded-xl font-bold text-slate-700 border border-transparent focus:border-indigo-500 outline-none">
->>>>>>> feb1f02 (first commit)
                             <option value="">-- Chọn khách --</option>
                             @foreach($tenants as $t)
                                 <option value="{{ $t->id }}">{{ $t->user?->name }}</option>
                             @endforeach
                         </select>
                     </div>
-<<<<<<< HEAD
                     <div class="space-y-2">
                         <label class="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">Phòng thuê</label>
                         <select name="room_id" required class="w-full px-5 py-3.5 bg-slate-50 border-none rounded-2xl font-bold text-slate-700 focus-ring transition-all outline-none">
@@ -438,7 +427,6 @@
                     <button type="submit" class="flex-1 py-4 bg-indigo-600 text-white rounded-2xl font-black uppercase tracking-widest text-sm shadow-xl shadow-indigo-100 hover:bg-slate-900 transition-all">Lưu & Xuất PDF</button>
                     <button type="button" onclick="closeModal()" class="px-8 py-4 bg-transparent text-slate-400 font-bold text-sm hover:text-slate-600 transition-all">Đóng</button>
                 </div>
-=======
 
                     <div>
                         <label class="text-xs font-bold text-slate-500 mb-1 block">Phòng thuê</label>
@@ -534,22 +522,17 @@
                     </button>
                 </div>
 
->>>>>>> feb1f02 (first commit)
             </form>
         </div>
     </div>
 </div>
 
 <script>
-<<<<<<< HEAD
     // Search Functionality
-=======
->>>>>>> feb1f02 (first commit)
     document.addEventListener('DOMContentLoaded', function() {
         const searchInput = document.getElementById('tableSearch');
         const rows = document.querySelectorAll('.search-item');
 
-<<<<<<< HEAD
         searchInput.addEventListener('input', function(e) {
             const query = e.target.value.toLowerCase().trim();
             rows.forEach(row => {
@@ -579,7 +562,6 @@
         const m = document.getElementById('modal');
         if (e.target === m) closeModal();
     }
-=======
         if (searchInput) {
             searchInput.addEventListener('input', function(e) {
                 const query = e.target.value.toLowerCase().trim();
@@ -701,7 +683,6 @@
     @if($errors->any())
         openModal();
     @endif
->>>>>>> feb1f02 (first commit)
 </script>
 
 @endsection

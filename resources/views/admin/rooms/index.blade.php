@@ -4,8 +4,6 @@
 @section('page_title','Hệ thống phòng cho thuê')
 
 @section('content')
-
-<<<<<<< HEAD
 <style>
     @keyframes modalSpring {
         0% { opacity: 0; transform: scale(0.9) translateY(20px); }
@@ -44,7 +42,6 @@
         <div>
             <h2 class="text-2xl font-black text-slate-800 tracking-tight">Danh sách phòng</h2>
             <p class="text-slate-500 text-sm font-medium mt-1">Quản lý kho phòng và trạng thái vận hành</p>
-=======
 <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
 <style>
@@ -112,12 +109,10 @@
         <div>
             <h2 class="text-2xl font-black text-slate-900">Quản lý phòng</h2>
             <p class="text-slate-500 text-sm">Kho phòng và trạng thái vận hành</p>
->>>>>>> feb1f02 (first commit)
         </div>
 
         <div class="flex items-center gap-3">
-            <div class="relative hidden lg:block">
-<<<<<<< HEAD
+            <div class="relative hidden lg:block"
                 <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">🔍</span>
                 <input type="text" id="tableSearch" placeholder="Tìm mã phòng, tòa nhà..." 
                     class="pl-11 pr-4 py-2.5 w-64 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus-ring transition-all outline-none">
@@ -125,19 +120,16 @@
             <button onclick="openModal()"
                 class="flex items-center gap-2 px-6 py-3 bg-slate-900 text-white rounded-xl font-bold text-sm shadow-xl shadow-slate-200 hover:bg-indigo-600 hover:shadow-indigo-200 transition-all active:scale-95">
                 <span>➕</span> Thêm phòng mới
-=======
                 <input type="text" id="tableSearch" placeholder="Tìm mã phòng..."
                     class="pl-4 pr-4 py-2.5 w-64 bg-white border rounded-xl text-sm focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all">
             </div>
             <button onclick="openCreateModal()"
                 class="px-6 py-3 bg-slate-900 text-white rounded-xl font-bold hover:bg-indigo-600 transition shadow-lg shadow-slate-200">
                 ➕ Thêm phòng mới
->>>>>>> feb1f02 (first commit)
             </button>
         </div>
     </div>
 
-<<<<<<< HEAD
     {{-- STATS CARDS --}}
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
         {{-- Tổng phòng - Màu trung tính --}}
@@ -282,7 +274,6 @@
                         <td colspan="6" class="px-8 py-20 text-center">
                             <p class="text-slate-400 font-bold">🚫 Chưa có dữ liệu phòng</p>
                         </td>
-=======
     <div class="grid grid-cols-3 gap-6 mb-8">
         <div class="bg-white p-6 rounded-xl border text-center">
             <p class="text-slate-400 text-xs font-bold uppercase tracking-wider">Tổng số phòng</p>
@@ -431,14 +422,12 @@
                     @empty
                     <tr>
                         <td colspan="6" class="py-10 text-center text-slate-400">Chưa có dữ liệu phòng</td>
->>>>>>> feb1f02 (first commit)
                     </tr>
                     @endforelse
                 </tbody>
             </table>
         </div>
     </div>
-<<<<<<< HEAD
 </div>
 
 {{-- MODAL THÊM PHÒNG --}}
@@ -543,7 +532,6 @@
                 <div class="flex flex-col md:flex-row gap-3 pt-6 border-t border-slate-50">
                     <button type="submit" class="flex-1 py-4 bg-indigo-600 text-white rounded-2xl font-black uppercase tracking-widest text-sm shadow-xl shadow-indigo-100 hover:bg-slate-900 transition-all">Lưu thông tin</button>
                     <button type="button" onclick="closeModal()" class="px-8 py-4 bg-transparent text-slate-400 font-bold text-sm hover:text-slate-600 transition-all">Đóng</button>
-=======
 
     {{-- MODAL XEM ẢNH GIỐNG TRANG TENANT --}}
     <template x-teleport="body">
@@ -752,14 +740,12 @@
                     <button type="button" onclick="closeCreateModal()" class="px-8 text-slate-400 font-bold hover:text-slate-600">
                         Hủy
                     </button>
->>>>>>> feb1f02 (first commit)
                 </div>
             </form>
         </div>
     </div>
 </div>
 
-<<<<<<< HEAD
 {{-- IMAGE PREVIEW (FULL SCREEN) --}}
 <div id="imageModal" class="fixed inset-0 bg-slate-900/90 backdrop-blur-md hidden items-center justify-center z-[200] p-4 transition-all" onclick="this.classList.replace('flex','hidden')">
     <div class="relative max-w-5xl w-full">
@@ -799,7 +785,6 @@
     window.onclick = function(e) {
         if (e.target.id === 'modal') closeModal();
     }
-=======
 <script>
     function openCreateModal(){
         const m = document.getElementById('modal');
@@ -832,7 +817,6 @@
     @if($errors->any())
         openCreateModal();
     @endif
->>>>>>> feb1f02 (first commit)
 </script>
 
 @endsection

@@ -8,10 +8,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class Contract extends Model
 {
     use HasFactory;
-<<<<<<< HEAD
-=======
-
->>>>>>> feb1f02 (first commit)
     public $timestamps = false;
 
     protected $fillable = [
@@ -26,10 +22,7 @@ class Contract extends Model
         'status',
         'contract_file',
 
-<<<<<<< HEAD
-=======
 
->>>>>>> feb1f02 (first commit)
         // ký hợp đồng
         'tenant_signed_at',
         'tenant_signed_name',
