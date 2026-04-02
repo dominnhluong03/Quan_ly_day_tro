@@ -101,10 +101,6 @@
                             Mật khẩu
                         </label>
 
-                        {{-- QUÊN MẬT KHẨU: link chạy thật --}}
-                        <a href="{{ route('password.request') }}" class="text-xs text-indigo-400 hover:text-indigo-300">
-                            Quên mật khẩu?
-                        </a>
                     </div>
 
                     <div class="relative">
@@ -151,8 +147,6 @@
                     </svg>
                 </button>
             </form>
-
-<<<<<<< HEAD
             <div class="mt-8 text-center">
                 <p class="text-sm text-white/40">
                     Chưa có tài khoản?
@@ -161,9 +155,6 @@
                     </a>
                 </p>
             </div>
-=======
-
->>>>>>> feb1f02 (first commit)
 
         </div>
     </div>

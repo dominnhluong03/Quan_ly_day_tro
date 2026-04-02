@@ -57,11 +57,9 @@
 
         <div class="px-6 py-5 border-b border-slate-700 shrink-0">
             <h1 class="text-xl font-bold tracking-tight text-blue-400">
-<<<<<<< HEAD
+
                  Quản Lý Phòng Trọ
-=======
-                 Quản Lý Dãy Trọ
->>>>>>> feb1f02 (first commit)
+
             </h1>
         </div>
 
@@ -69,17 +67,6 @@
             @php
                 $menu = [
                     ['route' => 'admin.dashboard', 'name' => 'Trang chủ', 'icon' => '🏠'],
-<<<<<<< HEAD
-                    ['route' => 'admin.users.index', 'name' => 'Tài khoản', 'icon' => '🔑'],
-                    ['route' => 'admin.buildings.index', 'name' => 'Tòa nhà', 'icon' => '🏢'],
-                    ['route' => 'admin.rooms.index', 'name' => 'Phòng', 'icon' => '🚪'],
-                    ['route' => 'admin.tenants.index', 'name' => 'Khách thuê', 'icon' => '👤'],
-                    ['route' => 'admin.contracts.index', 'name' => 'Hợp đồng', 'icon' => '📄'],
-                    ['route' => 'admin.bills.index', 'name' => 'Hóa đơn', 'icon' => '💳'],
-                    ['route' => 'admin.payments.index', 'name' => 'Thanh toán', 'icon' => '💳'],
-                    ['route' => 'admin.issues.index', 'name' => 'Sự cố', 'icon' => '⚠️'],
-                    ['route' => 'admin.password.index', 'name' => 'Đổi mật khẩu', 'icon' => '🔒'],
-=======
                     ['route' => 'admin.users.index', 'name' => 'Tài khoản', 'icon' => '👤'],
                     ['route' => 'admin.buildings.index', 'name' => 'Tòa nhà', 'icon' => '🏢'],
                     ['route' => 'admin.rooms.index', 'name' => 'Phòng', 'icon' => '🚪'],
@@ -89,7 +76,6 @@
                     ['route' => 'admin.payments.index', 'name' => 'Thanh toán', 'icon' => '💳'],
                     ['route' => 'admin.issues.index', 'name' => 'Sự cố', 'icon' => '⚠️'],
                     ['route' => 'admin.password.index', 'name' => 'Đổi mật khẩu', 'icon' => '🔐'],
->>>>>>> feb1f02 (first commit)
                 ];
             @endphp
 
@@ -142,13 +128,9 @@
                             <p class="text-[11px] text-slate-400 truncate mt-1 font-medium">{{ auth()->user()->email }}</p>
                         </div>
                         <div class="p-2 text-sm">
-<<<<<<< HEAD
                             <a href="#" class="flex items-center gap-3 px-4 py-2.5 rounded-xl font-bold text-slate-600 hover:bg-indigo-50 hover:text-indigo-600 transition-colors">
                                 <span>⚙️</span> Cài đặt hệ thống
                             </a>
-=======
-    
->>>>>>> feb1f02 (first commit)
                             <div class="my-1 border-t border-slate-50"></div>
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf

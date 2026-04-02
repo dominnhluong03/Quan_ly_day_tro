@@ -50,10 +50,7 @@
                 </span>
             </div>
             <p class="text-3xl font-semibold mt-3 text-emerald-700">{{ number_format($revenue ?? 0) }} đ</p>
-<<<<<<< HEAD
             <p class="text-xs text-gray-400 mt-2">Tổng doanh thu hóa đơn <span class="font-medium">paid</span> trong kỳ</p>
-=======
->>>>>>> feb1f02 (first commit)
         </div>
 
         <div class="bg-white/90 backdrop-blur p-6 rounded-2xl shadow-sm ring-1 ring-gray-100 hover:shadow-md transition">
@@ -62,11 +59,7 @@
                 <span class="text-xs px-2 py-1 rounded-full bg-amber-50 text-amber-700 ring-1 ring-amber-100">Pending</span>
             </div>
             <p class="text-3xl font-semibold mt-3 text-amber-700">{{ $issues ?? 0 }}</p>
-<<<<<<< HEAD
             <p class="text-xs text-gray-400 mt-2">Đếm theo <span class="font-medium">issue.status = pending</span></p>
-=======
-            
->>>>>>> feb1f02 (first commit)
         </div>
 
         <div class="bg-white/90 backdrop-blur p-6 rounded-2xl shadow-sm ring-1 ring-gray-100 hover:shadow-md transition">

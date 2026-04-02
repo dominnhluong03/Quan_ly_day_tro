@@ -36,12 +36,10 @@
     <div class="bg-white rounded-[2.5rem] shadow-2xl shadow-slate-200/50 border border-slate-100 overflow-hidden form-card">
         <div class="p-8 md:p-12">
 
-<<<<<<< HEAD
             {{-- Thông báo lỗi validate --}}
             @if ($errors->any())
                 <div class="mb-6 px-5 py-4 rounded-xl bg-rose-50 text-rose-700 font-bold">
                     Vui lòng kiểm tra lại thông tin.
-=======
             @if ($errors->any())
                 <div class="mb-6 px-5 py-4 rounded-xl bg-rose-50 text-rose-700 border border-rose-100">
                     <div class="font-bold mb-2">Vui lòng kiểm tra lại thông tin:</div>
@@ -50,7 +48,6 @@
                             <li>{{ $error }}</li>
                         @endforeach
                     </ul>
->>>>>>> feb1f02 (first commit)
                 </div>
             @endif
 
@@ -59,10 +56,7 @@
                 @method('PUT')
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-<<<<<<< HEAD
                     {{-- Khách thuê (Cố định) --}}
-=======
->>>>>>> feb1f02 (first commit)
                     <div class="space-y-2">
                         <label class="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1 flex items-center gap-2">
                             Khách thuê
@@ -79,10 +73,7 @@
                         @enderror
                     </div>
 
-<<<<<<< HEAD
                     {{-- Chọn phòng (lọc theo max_people) --}}
-=======
->>>>>>> feb1f02 (first commit)
                     <div class="space-y-2">
                         <label class="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">Số phòng thuê</label>
 
@@ -93,7 +84,6 @@
                                 @foreach($rooms as $r)
                                     @php
                                         $activeCount = $activeCountsByRoom[$r->id] ?? 0;
-<<<<<<< HEAD
 
                                         $isCurrentRoom = ($contract->room_id == $r->id);
                                         $countForCheck = $activeCount;
@@ -107,7 +97,6 @@
                                     @endphp
 
                                     {{-- Luôn cho phép hiển thị phòng hiện tại, còn phòng khác thì phải còn chỗ --}}
-=======
                                         $isCurrentRoom = ((int) $contract->room_id === (int) $r->id);
                                         $countForCheck = $activeCount;
 
@@ -119,7 +108,6 @@
                                         $isFull = ($countForCheck >= $maxPeople);
                                     @endphp
 
->>>>>>> feb1f02 (first commit)
                                     @if($isCurrentRoom || !$isFull)
                                         <option value="{{ $r->id }}" @selected(old('room_id', $contract->room_id) == $r->id)>
                                             {{ $r->room_code ?? ('Phòng #' . $r->id) }}
@@ -145,12 +133,10 @@
 
                 <div class="h-px bg-slate-50"></div>
 
-<<<<<<< HEAD
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div class="space-y-2">
                         <label class="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">Ngày bắt đầu</label>
                         <input type="date" name="start_date" value="{{ old('start_date', $contract->start_date) }}"
-=======
                 <div class="space-y-4">
                     <div class="flex items-center gap-3">
                         <div class="h-px flex-1 bg-slate-100"></div>
@@ -183,7 +169,6 @@
                     <div class="space-y-2">
                         <label class="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">Ngày bắt đầu mới</label>
                         <input type="date" name="start_date" value="{{ old('start_date', optional($contract->start_date)->format('Y-m-d')) }}"
->>>>>>> feb1f02 (first commit)
                                class="w-full px-6 py-4 bg-white border-2 border-slate-100 rounded-2xl font-bold text-slate-700 outline-none focus-ring transition-all">
                         @error('start_date')
                             <p class="text-rose-500 text-xs font-bold">{{ $message }}</p>
@@ -191,13 +176,10 @@
                     </div>
 
                     <div class="space-y-2">
-<<<<<<< HEAD
                         <label class="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">Ngày kết thúc</label>
                         <input type="date" name="end_date" value="{{ old('end_date', $contract->end_date) }}"
-=======
                         <label class="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">Ngày kết thúc mới</label>
                         <input type="date" name="end_date" value="{{ old('end_date', optional($contract->end_date)->format('Y-m-d')) }}"
->>>>>>> feb1f02 (first commit)
                                class="w-full px-6 py-4 bg-white border-2 border-slate-100 rounded-2xl font-bold text-slate-700 outline-none focus-ring transition-all">
                         @error('end_date')
                             <p class="text-rose-500 text-xs font-bold">{{ $message }}</p>
@@ -233,10 +215,7 @@
                         @enderror
                     </div>
 
-<<<<<<< HEAD
                     {{-- ✅ THÊM GIÁ ĐIỆN --}}
-=======
->>>>>>> feb1f02 (first commit)
                     <div class="space-y-2">
                         <label class="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">Giá điện (đ/kWh)</label>
                         <div class="relative">
@@ -250,10 +229,7 @@
                         @enderror
                     </div>
 
-<<<<<<< HEAD
                     {{-- ✅ THÊM GIÁ NƯỚC --}}
-=======
->>>>>>> feb1f02 (first commit)
                     <div class="space-y-2">
                         <label class="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">Giá nước (đ/m³)</label>
                         <div class="relative">
@@ -266,15 +242,12 @@
                             <p class="text-rose-500 text-xs font-bold">{{ $message }}</p>
                         @enderror
                     </div>
-<<<<<<< HEAD
 
                 </div>
 
                 {{-- Dịch vụ khác --}}
-=======
                 </div>
 
->>>>>>> feb1f02 (first commit)
                 <div class="space-y-2">
                     <label class="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">Dịch vụ khác</label>
                     <textarea name="service_note" rows="3"

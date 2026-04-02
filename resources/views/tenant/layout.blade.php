@@ -50,15 +50,12 @@
         </div>
 
         <nav class="p-4 space-y-1 text-sm flex-1 overflow-y-auto custom-scrollbar">
-<<<<<<< HEAD
-=======
             <a href="{{ route('tenant.rooms.index') }}"
                 class="group flex items-center gap-3 px-4 py-3 rounded-xl transition-all
                 {{ request()->routeIs('tenant.rooms.*') ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/20' : 'text-slate-300 hover:bg-slate-700/50 hover:text-white' }}">
                 <span>🏘️</span>
                 <span>Danh sách phòng trọ</span>
             </a>
->>>>>>> feb1f02 (first commit)
             <a href="{{ route('tenant.dashboard') }}"
                class="group flex items-center gap-3 px-4 py-3 rounded-xl transition-all
                {{ request()->routeIs('tenant.dashboard') ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/20' : 'text-slate-300 hover:bg-slate-700/50 hover:text-white' }}">
@@ -70,29 +67,6 @@
                {{ request()->routeIs('tenant.profile*') ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/20' : 'text-slate-300 hover:bg-slate-700/50 hover:text-white' }}">
                 <span class="text-lg">👤</span> <span>Thông tin cá nhân</span>
             </a>
-
-<<<<<<< HEAD
-            <a href="{{ route('tenant.password.index') }}"
-                class="group flex items-center gap-3 px-4 py-3 rounded-xl transition-all
-               {{ request()->routeIs('tenant.password.index') ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/20' : 'text-slate-300 hover:bg-slate-700/50 hover:text-white' }}">
-                <span class="text-lg">🔒</span> <span>Đổi mật khẩu</span>
-            </a>
-
-            <a href="{{ route('tenant.contracts.index') }}" class="group flex items-center gap-3 px-4 py-3 rounded-xl text-slate-300 hover:bg-slate-700/50 hover:text-white transition-all">
-                <span class="text-lg">📄</span> <span>Hợp đồng</span>
-            </a>
-
-            <a href="{{ route('tenant.bills.index') }}" class="group flex items-center gap-3 px-4 py-3 rounded-xl text-slate-300 hover:bg-slate-700/50 hover:text-white transition-all">
-                <span class="text-lg">💳</span> <span>Hóa đơn</span>
-            </a>
-
-            <a href="#" class="group flex items-center gap-3 px-4 py-3 rounded-xl text-slate-300 hover:bg-slate-700/50 hover:text-white transition-all">
-                <span class="text-lg">💳</span> <span>Thanh toán</span>
-            </a>
-
-            <a href="{{ route('tenant.issues.index') }}" class="group flex items-center gap-3 px-4 py-3 rounded-xl text-slate-300 hover:bg-slate-700/50 hover:text-white transition-all">
-                <span class="text-lg">⚠️</span> <span>Sự cố</span>
-=======
 
             <a href="{{ route('tenant.contracts.index') }}" 
             class="group flex items-center gap-3 px-4 py-3 rounded-xl transition-all
@@ -116,16 +90,12 @@
                 class="group flex items-center gap-3 px-4 py-3 rounded-xl transition-all
                {{ request()->routeIs('tenant.password.index') ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/20' : 'text-slate-300 hover:bg-slate-700/50 hover:text-white' }}">
                 <span class="text-lg">🔐</span> <span>Đổi mật khẩu</span>
->>>>>>> feb1f02 (first commit)
             </a>
         </nav>
         
         <div class="p-4 border-t border-slate-700 text-[10px] text-slate-500 text-center uppercase tracking-widest">
-<<<<<<< HEAD
             v1.0.2 Build 2026
-=======
             Liên hệ SĐT: 0339115903
->>>>>>> feb1f02 (first commit)
         </div>
     </aside>
 
@@ -172,11 +142,7 @@
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
                                 <button class="w-full text-left px-4 py-2.5 rounded-xl text-red-500 hover:bg-red-50 font-black text-sm flex items-center gap-3 transition-colors">
-<<<<<<< HEAD
-                                    <span class="text-lg text-red-400">🚪</span> Đăng xuất hệ thống
-=======
                                     <span class="text-lg text-red-400">🚪</span> Đăng xuất
->>>>>>> feb1f02 (first commit)
                                 </button>
                             </form>
                         </div>

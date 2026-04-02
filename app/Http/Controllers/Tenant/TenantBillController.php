@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Tenant;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Storage;
-
 use App\Models\Tenant;
 use App\Models\Invoice;
 use App\Models\Contract;
@@ -15,20 +14,17 @@ class TenantBillController extends Controller
     public function index()
     {
         $tenant = Tenant::where('user_id', auth()->id())->firstOrFail();
-        // ✅ Lấy danh sách room_id mà tenant này đang/đã có hợp đồng (ưu tiên active)
+
+        // Lấy danh sách room_id mà tenant này đang/đã có hợp đồng
         $roomIds = Contract::where('tenant_id', $tenant->id)
-            ->whereIn('status', ['active','expired']) // tuỳ bạn, muốn xem cả expired thì để
-        $roomIds = Contract::where('tenant_id', $tenant->id)
-            ->whereIn('status', ['active','expired'])
+            ->whereIn('status', ['active', 'expired'])
             ->pluck('room_id')
             ->unique()
             ->values()
             ->toArray();
 
-
-        // ✅ Lấy invoices theo room_id của contract (không ràng tenant_id trực tiếp)
+        // Lấy invoices theo room_id của contract
         $invoices = Invoice::with(['contract.room', 'contract.tenant.user'])
-        $invoices = Invoice::with(['contract.room']
             ->whereHas('contract', function ($q) use ($roomIds) {
                 $q->whereIn('room_id', $roomIds);
             })
@@ -37,11 +33,7 @@ class TenantBillController extends Controller
             ->orderByDesc('id')
             ->get();
 
-
-        return view('tenant.bills.index', compact('invoices'));
-    }
-
-        // lấy payment mới nhất
+        // Lấy payment mới nhất theo từng invoice
         $latestPayments = Payment::whereIn('invoice_id', $invoices->pluck('id'))
             ->orderByDesc('id')
             ->get()
@@ -62,18 +54,11 @@ class TenantBillController extends Controller
     {
         $this->authorizeInvoiceByRoom($invoice);
 
-        if (!$invoice->invoice_file) abort(404, 'Chưa có file hóa đơn');
-
-        $relative = str_replace('storage/', '', $invoice->invoice_file);
-        $path = Storage::disk('public')->path($relative);
-
-        if (!file_exists($path)) abort(404, 'File hóa đơn không tồn tại');
         if (!$invoice->invoice_file) {
             abort(404, 'Chưa có file hóa đơn');
         }
 
         $relative = str_replace('storage/', '', $invoice->invoice_file);
-
         $path = Storage::disk('public')->path($relative);
 
         if (!file_exists($path)) {
@@ -82,26 +67,19 @@ class TenantBillController extends Controller
 
         return response()->file($path, [
             'Content-Type' => 'application/pdf',
-            'Content-Disposition' => 'inline; filename="'.basename($path).'"',
+            'Content-Disposition' => 'inline; filename="' . basename($path) . '"',
         ]);
     }
-
 
     public function download(Invoice $invoice)
     {
         $this->authorizeInvoiceByRoom($invoice);
-        if (!$invoice->invoice_file) abort(404, 'Chưa có file hóa đơn');
 
-        $relative = str_replace('storage/', '', $invoice->invoice_file);
-        $path = Storage::disk('public')->path($relative);
-
-        if (!file_exists($path)) abort(404, 'File hóa đơn không tồn tại');
         if (!$invoice->invoice_file) {
             abort(404, 'Chưa có file hóa đơn');
         }
 
         $relative = str_replace('storage/', '', $invoice->invoice_file);
-
         $path = Storage::disk('public')->path($relative);
 
         if (!file_exists($path)) {
@@ -116,13 +94,10 @@ class TenantBillController extends Controller
     private function authorizeInvoiceByRoom(Invoice $invoice): void
     {
         $tenant = Tenant::where('user_id', auth()->id())->firstOrFail();
-        $roomIdOfInvoice = (int)($invoice->contract?->room_id);
-
-        // tenant phải có hợp đồng với phòng đó (active/expired)
         $roomIdOfInvoice = (int) ($invoice->contract?->room_id);
 
         $hasRoom = Contract::where('tenant_id', $tenant->id)
-            ->whereIn('status', ['active','expired'])
+            ->whereIn('status', ['active', 'expired'])
             ->where('room_id', $roomIdOfInvoice)
             ->exists();
 

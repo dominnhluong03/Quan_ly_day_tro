@@ -8,19 +8,15 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
-<<<<<<< HEAD
         .focus-ring:focus { box-shadow: 0 0 0 4px rgba(99,102,241,.1); border-color: #6366f1; }
-=======
         .focus-ring:focus {
             box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
             border-color: #6366f1;
         }
->>>>>>> feb1f02 (first commit)
     </style>
 </head>
 <body class="p-6 md:p-12">
 
-<<<<<<< HEAD
 <div class="max-w-3xl mx-auto">
 
     <div class="mb-10">
@@ -34,7 +30,6 @@
 
     @if($errors->any())
         <div class="mb-6 px-5 py-4 rounded-xl bg-rose-50 text-rose-700 font-bold">
-=======
 @php
     $room = $invoice->contract?->room;
     $tenant = $invoice->contract?->tenant?->user;
@@ -70,12 +65,10 @@
 
     @if($errors->any())
         <div class="mb-6 px-5 py-4 rounded-xl bg-rose-50 text-rose-700 font-bold border border-rose-100">
->>>>>>> feb1f02 (first commit)
             ❌ {{ $errors->first() }}
         </div>
     @endif
 
-<<<<<<< HEAD
     <div class="bg-white rounded-[2.5rem] shadow-2xl border border-slate-100 overflow-hidden">
         <div class="p-8 md:p-12">
 
@@ -130,7 +123,6 @@
                     <div class="flex items-center justify-between mb-3">
                         <p class="font-black text-sm">🧾 Dịch vụ khác</p>
                         <button type="button" onclick="addServiceRow()" class="px-3 py-2 rounded-lg bg-white border font-bold text-sm">
-=======
     {{-- thông tin nhanh --}}
     <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
         <div class="bg-white rounded-2xl border border-slate-100 p-5">
@@ -266,27 +258,22 @@
                         <button type="button"
                                 onclick="addServiceRow()"
                                 class="px-3 py-2 rounded-lg bg-white border border-slate-200 font-bold text-sm hover:bg-slate-100 transition">
->>>>>>> feb1f02 (first commit)
                             ➕ Thêm
                         </button>
                     </div>
 
                     <div id="serviceRows" class="space-y-2">
-<<<<<<< HEAD
                         @php
                             $oldNames = old('service_name', $invoice->services->pluck('service_name')->toArray());
                             $oldPrices = old('service_price', $invoice->services->pluck('price')->toArray());
                         @endphp
 
                         @for($k=0; $k < max(count($oldNames), count($oldPrices)); $k++)
-=======
                         @for($k = 0; $k < max(count($oldNames), count($oldPrices)); $k++)
->>>>>>> feb1f02 (first commit)
                             @php
                                 $n = $oldNames[$k] ?? '';
                                 $p = $oldPrices[$k] ?? '';
-                            @endphp
-<<<<<<< HEAD
+                            @endph
                             <div class="grid grid-cols-12 gap-2 service-row">
                                 <div class="col-span-7">
                                     <input type="text" name="service_name[]" value="{{ $n }}"
@@ -299,8 +286,7 @@
                                 <div class="col-span-1 flex items-center justify-end">
                                     <button type="button"
                                             class="px-3 py-2 rounded-lg bg-rose-50 text-rose-600 font-black"
-                                            onclick="this.closest('.service-row').remove();">✕</button>
-=======
+                                            onclick="this.closest('.service-row').remove();">✕</button
 
                             <div class="grid grid-cols-12 gap-2 service-row">
                                 <div class="col-span-7">
@@ -326,14 +312,11 @@
                                             onclick="this.closest('.service-row').remove();">
                                         ✕
                                     </button>
->>>>>>> feb1f02 (first commit)
                                 </div>
                             </div>
                         @endfor
                     </div>
                 </div>
-
-<<<<<<< HEAD
                 <div>
                     <label class="text-xs font-bold">Trạng thái</label>
                     <select name="status" class="w-full p-3 bg-slate-50 rounded-xl focus-ring font-bold">
@@ -348,8 +331,6 @@
                         Lưu & Cập nhật PDF
                     </button>
                 </div>
-
-=======
                 {{-- trạng thái --}}
                 <div>
                     <label class="text-xs font-black text-slate-500 uppercase tracking-widest ml-1">Trạng thái thanh toán</label>
@@ -371,12 +352,10 @@
                         Lưu & Cập nhật PDF
                     </button>
                 </div>
->>>>>>> feb1f02 (first commit)
             </form>
 
         </div>
     </div>
-<<<<<<< HEAD
 
 </div>
 
@@ -397,7 +376,6 @@ function addServiceRow(){
                     onclick="this.closest('.service-row').remove();">✕</button>
         </div>
     `;
-=======
 </div>
 
 <script>
@@ -429,7 +407,6 @@ function addServiceRow() {
         </div>
     `;
 
->>>>>>> feb1f02 (first commit)
     wrap.appendChild(row);
 }
 </script>

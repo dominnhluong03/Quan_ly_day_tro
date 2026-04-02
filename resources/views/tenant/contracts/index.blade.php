@@ -1,6 +1,4 @@
 @extends('tenant.layout')
-
-<<<<<<< HEAD
 @section('title','Hợp đồng')
 @section('page_title','Hợp đồng')
 
@@ -86,7 +84,6 @@
 
     </div>
 </div>
-=======
 @section('title', 'Quản lý Hợp đồng')
 @section('page_title', 'Hợp đồng thuê')
 
@@ -341,6 +338,4 @@
         </div>
     </div>
 </div>
-
->>>>>>> feb1f02 (first commit)
 @endsection

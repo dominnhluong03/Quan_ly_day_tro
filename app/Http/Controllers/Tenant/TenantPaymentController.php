@@ -10,27 +10,20 @@ use Illuminate\Support\Facades\Storage;
 use App\Models\Tenant;
 use App\Models\Invoice;
 use App\Models\Payment;
-<<<<<<< HEAD
-=======
 use App\Models\Contract;
->>>>>>> feb1f02 (first commit)
 
 class TenantPaymentController extends Controller
 {
     /**
-<<<<<<< HEAD
      * Tenant upload chứng từ thanh toán cho invoice
      * - chỉ cần 1 người trong phòng upload
      * - nếu đã có pending/approved => không cho upload nữa (hoặc bạn có thể cho update)
-=======
      * Tenant upload chứng từ thanh toán
->>>>>>> feb1f02 (first commit)
      */
     public function store(Request $request, Invoice $invoice)
     {
         $this->authorizeInvoiceRoom($invoice);
 
-<<<<<<< HEAD
         // nếu đã paid thì không cần upload nữa
         if ($invoice->status === 'paid') {
             return back()->withErrors(['error' => 'Hóa đơn này đã được thanh toán.']);
@@ -39,7 +32,6 @@ class TenantPaymentController extends Controller
         // ✅ nếu đã có payment pending/approved thì chặn upload lần nữa (đúng ý bạn: 1 người up là đủ)
         $existing = Payment::where('invoice_id', $invoice->id)
             ->whereIn('status', ['pending', 'approved'])
-=======
         // nếu invoice đã paid thì không cần gửi nữa
         if ($invoice->status === 'paid') {
             return back()->withErrors([
@@ -49,31 +41,25 @@ class TenantPaymentController extends Controller
 
         // kiểm tra nếu đã có payment pending/approved
         $existing = Payment::where('invoice_id', $invoice->id)
-            ->whereIn('status', ['pending','approved'])
->>>>>>> feb1f02 (first commit)
+            ->whereIn('status', ['pending','approved']
             ->latest('id')
             ->first();
 
         if ($existing) {
-<<<<<<< HEAD
             return back()->withErrors(['error' => 'Hóa đơn này đã có chứng từ thanh toán (đang chờ duyệt hoặc đã duyệt).']);
         }
 
         // ✅ validate đúng field "image"
-=======
             return back()->withErrors([
                 'error' => 'Hóa đơn này đã có chứng từ thanh toán (đang chờ duyệt hoặc đã duyệt).'
             ]);
         }
-
->>>>>>> feb1f02 (first commit)
         $data = $request->validate([
             'image' => 'required|image|mimes:jpg,jpeg,png,webp|max:4096',
             'note'  => 'nullable|string|max:255',
         ]);
 
-        DB::beginTransaction();
-<<<<<<< HEAD
+        DB::beginTransaction()
         try {
             // lưu ảnh vào storage/app/public/payments
             $path = $request->file('image')->store('payments', 'public');
@@ -97,7 +83,6 @@ class TenantPaymentController extends Controller
     /**
      * ✅ FIX lỗi authorizeInvoiceRoom() không tồn tại
      * Cho phép tenant upload nếu invoice thuộc phòng của tenant (qua contract.room_id)
-=======
 
         try {
 
@@ -128,7 +113,6 @@ class TenantPaymentController extends Controller
 
     /**
      * Kiểm tra tenant có quyền upload cho invoice không
->>>>>>> feb1f02 (first commit)
      */
     private function authorizeInvoiceRoom(Invoice $invoice): void
     {
@@ -139,19 +123,15 @@ class TenantPaymentController extends Controller
         if (!$invoice->contract) {
             abort(404, 'Hóa đơn không có hợp đồng liên kết.');
         }
-
-<<<<<<< HEAD
         // ✅ invoice thuộc về tenant nào cũng được miễn là cùng phòng (room_id)
         // Vì bạn muốn 2 người cùng phòng: 1 người up là đủ.
         // => check tenant có contract active cùng room_id với invoice.contract.room_id
         $roomId = (int) $invoice->contract->room_id;
 
         $hasAccess = \App\Models\Contract::where('tenant_id', $tenant->id)
-=======
         $roomId = (int) $invoice->contract->room_id;
 
         $hasAccess = Contract::where('tenant_id', $tenant->id)
->>>>>>> feb1f02 (first commit)
             ->where('room_id', $roomId)
             ->where('status', 'active')
             ->exists();

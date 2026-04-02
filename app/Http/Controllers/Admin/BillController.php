@@ -19,7 +19,10 @@ use Barryvdh\DomPDF\Facade\Pdf;
 class BillController extends Controller
 {
     public function index()
-tract.tenant.user',
+    {
+        $invoices = Invoice::with([
+            'contract.room',
+            'contract.tenant.user',
             'services',
             'meter',
         ])
@@ -88,7 +91,7 @@ tract.tenant.user',
 
         if (!$contract) {
             return back()->withErrors([
-                'room_id' => 'Phòng chưa có hợp đồng active.'
+                'room_id' => 'Phòng chưa có hợp đồng active.',
             ])->withInput();
         }
 
@@ -100,15 +103,13 @@ tract.tenant.user',
 
             if ($invoiceDate->lt($contractStart) || $invoiceDate->gt($contractEnd)) {
                 return back()->withErrors([
-                    'month' => 'Tháng không nằm trong thời gian hợp đồng.'
+                    'month' => 'Tháng không nằm trong thời gian hợp đồng.',
                 ])->withInput();
             }
-        } else {
-            if ($invoiceDate->lt($contractStart)) {
-                return back()->withErrors([
-                    'month' => 'Không thể tạo trước ngày bắt đầu hợp đồng.'
-                ])->withInput();
-            }
+        } elseif ($invoiceDate->lt($contractStart)) {
+            return back()->withErrors([
+                'month' => 'Không thể tạo trước ngày bắt đầu hợp đồng.',
+            ])->withInput();
         }
 
         $exists = Invoice::where('month', $data['month'])
@@ -120,7 +121,7 @@ tract.tenant.user',
 
         if ($exists) {
             return back()->withErrors([
-                'month' => 'Đã có hóa đơn tháng này rồi.'
+                'month' => 'Đã có hóa đơn tháng này rồi.',
             ])->withInput();
         }
 
@@ -146,13 +147,13 @@ tract.tenant.user',
 
         if ($electricNew < $electricOld) {
             return back()->withErrors([
-                'electric_new' => 'Chỉ số điện mới không được nhỏ hơn chỉ số điện cũ.'
+                'electric_new' => 'Chỉ số điện mới không được nhỏ hơn chỉ số điện cũ.',
             ])->withInput();
         }
 
         if ($waterNew < $waterOld) {
             return back()->withErrors([
-                'water_new' => 'Chỉ số nước mới không được nhỏ hơn chỉ số nước cũ.'
+                'water_new' => 'Chỉ số nước mới không được nhỏ hơn chỉ số nước cũ.',
             ])->withInput();
         }
 
@@ -231,7 +232,7 @@ tract.tenant.user',
             DB::rollBack();
 
             return back()->withErrors([
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ])->withInput();
         }
     }
@@ -242,7 +243,7 @@ tract.tenant.user',
             'contract.room',
             'contract.tenant.user',
             'services',
-            'meter'
+            'meter',
         ])->findOrFail($invoiceId);
 
         $pdf = Pdf::loadView('admin.bills.pdf', compact('invoice'))->setPaper('a4');
@@ -319,7 +320,7 @@ tract.tenant.user',
             DB::rollBack();
 
             return back()->withErrors([
-                'error' => 'Lỗi khi xoá: ' . $e->getMessage()
+                'error' => 'Lỗi khi xoá: ' . $e->getMessage(),
             ]);
         }
     }
@@ -365,7 +366,7 @@ tract.tenant.user',
 
         if ($exists) {
             return back()->withErrors([
-                'month' => 'Đã có hóa đơn tháng này rồi.'
+                'month' => 'Đã có hóa đơn tháng này rồi.',
             ])->withInput();
         }
 
@@ -376,13 +377,13 @@ tract.tenant.user',
 
         if ($electricNew < $electricOld) {
             return back()->withErrors([
-                'electric_new' => 'Chỉ số điện mới không được nhỏ hơn chỉ số điện cũ.'
+                'electric_new' => 'Chỉ số điện mới không được nhỏ hơn chỉ số điện cũ.',
             ])->withInput();
         }
 
         if ($waterNew < $waterOld) {
             return back()->withErrors([
-                'water_new' => 'Chỉ số nước mới không được nhỏ hơn chỉ số nước cũ.'
+                'water_new' => 'Chỉ số nước mới không được nhỏ hơn chỉ số nước cũ.',
             ])->withInput();
         }
 
@@ -459,7 +460,7 @@ tract.tenant.user',
             DB::rollBack();
 
             return back()->withErrors([
-                'error' => 'Lỗi cập nhật: ' . $e->getMessage()
+                'error' => 'Lỗi cập nhật: ' . $e->getMessage(),
             ])->withInput();
         }
     }
