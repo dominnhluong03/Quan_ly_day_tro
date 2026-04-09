@@ -14,8 +14,8 @@ use Illuminate\Support\Facades\DB;
 class ContractController extends Controller
 {
     /**
-     * Tự động cập nhật hợp đồng active nhưng đã quá hạn thành expired,
-     * đồng thời đồng bộ trạng thái tenant/room.
+     * Tự động cập nhật hợp đồng active đã quá hạn thành expired,
+     * đồng thời đồng bộ trạng thái tenant và room.
      */
     private function refreshExpiredContracts(): void
     {
@@ -51,6 +51,86 @@ class ContractController extends Controller
         }
     }
 
+    /**
+     * Lấy danh sách phòng còn chỗ ở kèm hợp đồng active.
+     */
+    private function getAvailableRoomsForForm()
+    {
+        return Room::with([
+                'contracts' => function ($q) {
+                    $q->where('status', 'active')
+                        ->with(['tenant.user'])
+                        ->orderByDesc('id');
+                },
+            ])
+            ->withCount([
+                'contracts as active_count' => function ($q) {
+                    $q->where('status', 'active');
+                },
+            ])
+            ->orderBy('room_code')
+            ->get();
+    }
+
+    /**
+     * Đồng bộ trạng thái tenant theo hợp đồng active còn tồn tại hay không.
+     */
+    private function syncTenantStatus(int $tenantId): void
+    {
+        $hasActive = Contract::where('tenant_id', $tenantId)
+            ->where('status', 'active')
+            ->exists();
+
+        Tenant::where('id', $tenantId)->update([
+            'status' => $hasActive ? 'renting' : 'free',
+        ]);
+    }
+
+    /**
+     * Đồng bộ trạng thái room theo hợp đồng active còn tồn tại hay không.
+     */
+    private function syncRoomStatus(int $roomId): void
+    {
+        $room = Room::find($roomId);
+
+        if (! $room || $room->status === 'maintenance') {
+            return;
+        }
+
+        $hasActive = Contract::where('room_id', $roomId)
+            ->where('status', 'active')
+            ->exists();
+
+        $room->update([
+            'status' => $hasActive ? 'occupied' : 'empty',
+        ]);
+    }
+
+    /**
+     * Xuất lại PDF hợp đồng.
+     */
+    private function generateContractPdf(Contract $contract): void
+    {
+        $contract->load(['room', 'tenant.user']);
+
+        $pdf = Pdf::loadView('admin.contracts.pdf', [
+            'contract' => $contract,
+        ]);
+
+        $folder = public_path('contracts');
+
+        if (! file_exists($folder)) {
+            mkdir($folder, 0777, true);
+        }
+
+        $fileName = 'contract_' . $contract->id . '.pdf';
+        $pdf->save($folder . '/' . $fileName);
+
+        $contract->update([
+            'contract_file' => 'contracts/' . $fileName,
+        ]);
+    }
+
     public function index()
     {
         $this->refreshExpiredContracts();
@@ -66,19 +146,7 @@ class ContractController extends Controller
             ->orderByDesc('id')
             ->get();
 
-        $rooms = Room::with([
-                'contracts' => function ($q) {
-                    $q->where('status', 'active')
-                        ->with(['tenant.user'])
-                        ->orderByDesc('id');
-                },
-            ])
-            ->withCount([
-                'contracts as active_count' => function ($q) {
-                    $q->where('status', 'active');
-                },
-            ])
-            ->get()
+        $rooms = $this->getAvailableRoomsForForm()
             ->filter(function ($room) {
                 return $room->active_count < ($room->max_people ?? 1);
             })
@@ -126,48 +194,27 @@ class ContractController extends Controller
             $created = [];
 
             foreach ($tenantIds as $tenantId) {
+                $status = 'active';
+
+                if (! empty($data['end_date']) && Carbon::parse($data['end_date'])->lt(Carbon::today())) {
+                    $status = 'expired';
+                }
+
                 $contract = Contract::create([
                     'room_id' => $room->id,
                     'tenant_id' => $tenantId,
                     'start_date' => $data['start_date'],
                     'end_date' => $data['end_date'] ?? null,
                     'deposit' => $data['deposit'],
-                    'status' => 'active',
+                    'status' => $status,
                     'electric_price' => $data['electric_price'],
                     'water_price' => $data['water_price'],
                     'service_note' => $data['service_note'] ?? null,
                 ]);
 
-                if ($contract->end_date && Carbon::parse($contract->end_date)->lt(Carbon::today())) {
-                    $contract->update(['status' => 'expired']);
-                }
-
-                if ($contract->status === 'active') {
-                    $contract->tenant->update(['status' => 'renting']);
-
-                    if ($room->status !== 'maintenance') {
-                        $room->update(['status' => 'occupied']);
-                    }
-                }
-
-                $contract->load(['room', 'tenant.user']);
-
-                $pdf = Pdf::loadView('admin.contracts.pdf', [
-                    'contract' => $contract,
-                ]);
-
-                $folder = public_path('contracts');
-
-                if (! file_exists($folder)) {
-                    mkdir($folder, 0777, true);
-                }
-
-                $fileName = 'contract_' . $contract->id . '.pdf';
-                $pdf->save($folder . '/' . $fileName);
-
-                $contract->update([
-                    'contract_file' => 'contracts/' . $fileName,
-                ]);
+                $this->syncTenantStatus((int) $tenantId);
+                $this->syncRoomStatus((int) $room->id);
+                $this->generateContractPdf($contract);
 
                 $created[] = $contract->id;
             }
@@ -193,9 +240,14 @@ class ContractController extends Controller
         $this->refreshExpiredContracts();
 
         $contract->load(['tenant.user', 'room']);
-        $rooms = Room::orderBy('room_code')->get();
 
-        return view('admin.contracts.edit', compact('contract', 'rooms'));
+        $tenants = Tenant::with('user')
+            ->orderByDesc('id')
+            ->get();
+
+        $rooms = $this->getAvailableRoomsForForm();
+
+        return view('admin.contracts.edit', compact('contract', 'tenants', 'rooms'));
     }
 
     public function update(Request $request, Contract $contract)
@@ -206,95 +258,60 @@ class ContractController extends Controller
             'start_date' => 'required|date',
             'end_date' => 'nullable|date|after_or_equal:start_date',
             'deposit' => 'required|numeric|min:0',
-            'status' => 'required|in:active,expired,cancelled',
             'electric_price' => 'required|numeric|min:0',
             'water_price' => 'required|numeric|min:0',
             'service_note' => 'nullable|string',
         ]);
 
+        $newRoom = Room::findOrFail($data['room_id']);
+        $oldRoomId = (int) $contract->room_id;
+        $oldTenantId = (int) $contract->tenant_id;
+
+        $newStatus = 'active';
+        if (! empty($data['end_date']) && Carbon::parse($data['end_date'])->lt(Carbon::today())) {
+            $newStatus = 'expired';
+        }
+
+        $activeCountInNewRoom = Contract::where('room_id', $newRoom->id)
+            ->where('status', 'active')
+            ->where('id', '!=', $contract->id)
+            ->count();
+
+        $maxPeople = (int) ($newRoom->max_people ?? 1);
+
+        if ($newStatus === 'active' && $activeCountInNewRoom >= $maxPeople) {
+            return back()->withInput()->withErrors([
+                'room_id' => "Phòng {$newRoom->room_code} đã đủ {$maxPeople} người.",
+            ]);
+        }
+
         DB::beginTransaction();
 
         try {
-            $oldRoomId = (int) $contract->room_id;
-            $oldTenantId = (int) $contract->tenant_id;
+            $contract->update([
+                'tenant_id' => $data['tenant_id'],
+                'room_id' => $data['room_id'],
+                'start_date' => $data['start_date'],
+                'end_date' => $data['end_date'] ?? null,
+                'deposit' => $data['deposit'],
+                'status' => $newStatus,
+                'electric_price' => $data['electric_price'],
+                'water_price' => $data['water_price'],
+                'service_note' => $data['service_note'] ?? null,
+            ]);
 
-            if (! empty($data['end_date']) && Carbon::parse($data['end_date'])->lt(Carbon::today())) {
-                $data['status'] = 'expired';
-            }
+            $this->syncTenantStatus((int) $contract->tenant_id);
+            $this->syncRoomStatus((int) $contract->room_id);
 
-            $contract->update($data);
-
-            if ($data['status'] === 'active') {
-                $contract->tenant->update(['status' => 'renting']);
-            } else {
-                $stillActive = Contract::where('tenant_id', $contract->tenant_id)
-                    ->where('status', 'active')
-                    ->count();
-
-                if ($stillActive == 0) {
-                    $contract->tenant->update(['status' => 'free']);
-                }
-            }
-
-            $newRoom = Room::findOrFail($contract->room_id);
-
-            if ($data['status'] === 'active') {
-                if ($newRoom->status !== 'maintenance') {
-                    $newRoom->update(['status' => 'occupied']);
-                }
-            } else {
-                $activeInNewRoom = Contract::where('room_id', $newRoom->id)
-                    ->where('status', 'active')
-                    ->count();
-
-                if ($activeInNewRoom == 0 && $newRoom->status !== 'maintenance') {
-                    $newRoom->update(['status' => 'empty']);
-                }
+            if ($oldTenantId !== (int) $contract->tenant_id) {
+                $this->syncTenantStatus($oldTenantId);
             }
 
             if ($oldRoomId !== (int) $contract->room_id) {
-                $oldRoom = Room::find($oldRoomId);
-
-                if ($oldRoom && $oldRoom->status !== 'maintenance') {
-                    $activeInOldRoom = Contract::where('room_id', $oldRoomId)
-                        ->where('status', 'active')
-                        ->count();
-
-                    if ($activeInOldRoom == 0) {
-                        $oldRoom->update(['status' => 'empty']);
-                    }
-                }
+                $this->syncRoomStatus($oldRoomId);
             }
 
-            if ($oldTenantId !== (int) $contract->tenant_id) {
-                $stillActiveOldTenant = Contract::where('tenant_id', $oldTenantId)
-                    ->where('status', 'active')
-                    ->count();
-
-                if ($stillActiveOldTenant == 0) {
-                    Tenant::where('id', $oldTenantId)->update(['status' => 'free']);
-                }
-            }
-
-            $contract->load(['room', 'tenant.user']);
-
-            $pdf = Pdf::loadView('admin.contracts.pdf', [
-                'contract' => $contract,
-            ]);
-
-            $folder = public_path('contracts');
-
-            if (! file_exists($folder)) {
-                mkdir($folder, 0777, true);
-            }
-
-            $fileName = 'contract_' . $contract->id . '.pdf';
-            $pdf->save($folder . '/' . $fileName);
-
-            $contract->update([
-                'contract_file' => 'contracts/' . $fileName,
-            ]);
-
+            $this->generateContractPdf($contract);
             $this->refreshExpiredContracts();
 
             DB::commit();
@@ -343,25 +360,8 @@ class ContractController extends Controller
 
             $contract->delete();
 
-            $stillActiveTenant = Contract::where('tenant_id', $tenantId)
-                ->where('status', 'active')
-                ->count();
-
-            if ($stillActiveTenant == 0) {
-                Tenant::where('id', $tenantId)->update(['status' => 'free']);
-            }
-
-            $room = Room::find($roomId);
-
-            if ($room && $room->status !== 'maintenance') {
-                $stillActiveRoom = Contract::where('room_id', $roomId)
-                    ->where('status', 'active')
-                    ->count();
-
-                if ($stillActiveRoom == 0) {
-                    $room->update(['status' => 'empty']);
-                }
-            }
+            $this->syncTenantStatus($tenantId);
+            $this->syncRoomStatus($roomId);
 
             DB::commit();
 

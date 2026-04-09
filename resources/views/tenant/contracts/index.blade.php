@@ -1,340 +1,308 @@
-@extends('tenant.layout')
-@section('title','Hợp đồng')
-@section('page_title','Hợp đồng')
+@extends('admin.layout')
 
-@section('content')
-
-<div class="max-w-5xl mx-auto">
-
-    @if(session('success'))
-        <div class="mb-6 px-5 py-4 rounded-xl bg-emerald-50 text-emerald-700 font-bold">
-            ✓ {{ session('success') }}
-        </div>
-    @endif
-
-    @if($errors->any())
-        <div class="mb-6 px-5 py-4 rounded-xl bg-rose-50 text-rose-700 font-bold">
-            ❌ {{ $errors->first() }}
-        </div>
-    @endif
-
-    <div class="bg-white rounded-2xl border overflow-hidden">
-        <div class="px-6 py-5 border-b">
-            <h2 class="text-xl font-black text-slate-800">Hợp đồng của bạn</h2>
-            <p class="text-sm text-slate-500">Xem hợp đồng PDF của bạn</p>
-        </div>
-
-        <div class="overflow-x-auto">
-            <table class="w-full">
-                <thead class="bg-slate-50 text-xs uppercase text-slate-500">
-                    <tr>
-                        <th class="px-6 py-4 text-left">Phòng</th>
-                        <th class="px-6 py-4 text-left">Thời hạn</th>
-                        <th class="px-6 py-4 text-center">Trạng thái</th>
-                        <th class="px-6 py-4 text-center">PDF</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                    @forelse($contracts as $c)
-                    <tr class="border-t">
-                        <td class="px-6 py-4 font-bold">
-                            {{ $c->room?->room_code ?? ('#'.$c->room_id) }}
-                        </td>
-
-                        <td class="px-6 py-4 text-sm">
-                            {{ \Carbon\Carbon::parse($c->start_date)->format('d/m/Y') }}
-                            →
-                            {{ $c->end_date ? \Carbon\Carbon::parse($c->end_date)->format('d/m/Y') : '---' }}
-                        </td>
-
-                        <td class="px-6 py-4 text-center">
-                            @if($c->status === 'active')
-                                <span class="px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-black">ACTIVE</span>
-                            @elseif($c->status === 'expired')
-                                <span class="px-3 py-1 rounded-full bg-slate-100 text-slate-600 text-xs font-black">EXPIRED</span>
-                            @else
-                                <span class="px-3 py-1 rounded-full bg-rose-50 text-rose-600 text-xs font-black">CANCELLED</span>
-                            @endif
-                        </td>
-
-                        <td class="px-6 py-4 text-center">
-                            @if($c->contract_file)
-                                <a href="{{ route('tenant.contracts.view', $c->id) }}"
-                                   target="_blank"
-                                   class="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-indigo-600 text-white text-sm font-bold hover:bg-indigo-700 transition">
-                                    📄 Xem
-                                </a>
-                            @else
-                                <span class="text-slate-400 text-sm">Chưa có</span>
-                            @endif
-                        </td>
-                    </tr>
-                    @empty
-                    <tr>
-                        <td colspan="4" class="px-6 py-10 text-center text-slate-400">
-                            Chưa có hợp đồng
-                        </td>
-                    </tr>
-                    @endforelse
-                </tbody>
-
-            </table>
-        </div>
-
-    </div>
-</div>
-@section('title', 'Quản lý Hợp đồng')
-@section('page_title', 'Hợp đồng thuê')
+@section('title', 'Chỉnh sửa hợp đồng')
+@section('page_title', 'Chỉnh sửa hợp đồng')
 
 @section('content')
 <style>
-    [x-cloak] { display: none !important; }
-
-    .glass-card {
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(226, 232, 240, 0.8);
+    .focus-ring:focus {
+        box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+        border-color: #6366f1;
     }
 
-    .table-container {
-        overflow: hidden;
-        border-radius: 1rem;
-        border: 1px solid rgb(226 232 240);
-        background: white;
-        box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    .form-card {
+        animation: slideUp .45s ease-out;
     }
 
-    .modal-scroll::-webkit-scrollbar { width: 5px; }
-    .modal-scroll::-webkit-scrollbar-track { background: #f1f5f9; }
-    .modal-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(16px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    input[type="file"]::file-selector-button {
+        background: #f1f5f9;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 12px;
+        color: #475569;
+        font-weight: 700;
+        cursor: pointer;
+        margin-right: 12px;
+    }
 </style>
 
-<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+<div class="max-w-5xl mx-auto">
+    <div class="mb-8">
+        <a href="{{ route('admin.contracts.index') }}"
+           class="inline-flex items-center gap-2 text-slate-400 hover:text-indigo-600 font-bold text-sm transition">
+            ← Quay lại
+        </a>
 
-<div class="max-w-6xl mx-auto space-y-6 pb-20" x-data="{
-    openRenew: false,
-    renewId: null,
-    roomCode: '',
-    oldEndDate: '',
-    newEndDate: '',
-    isLoading: false,
+        <h2 class="text-3xl font-black text-slate-800 mt-3">
+            Chỉnh sửa hợp đồng
+        </h2>
 
-    isValidDate() {
-        if(!this.newEndDate || !this.oldEndDate) return false;
-        return new Date(this.newEndDate) > new Date(this.oldEndDate);
-    },
-    
-    diffDays() {
-        if(!this.isValidDate()) return 0;
-        const start = new Date(this.oldEndDate);
-        const end = new Date(this.newEndDate);
-        return Math.ceil((end - start) / (1000 * 60 * 60 * 24));
-    }
-}">
-
-    {{-- Alert Messages --}}
-    @if(session('success'))
-        <div class="flex items-center p-4 mb-4 text-emerald-800 rounded-2xl bg-emerald-50 border border-emerald-100 animate-fade-in-down">
-            <svg class="w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
-            <span class="font-bold text-sm">{{ session('success') }}</span>
-        </div>
-    @endif
-
-    {{-- Header Section --}}
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-            <h1 class="text-2xl font-black text-slate-800 tracking-tight">Danh sách hợp đồng</h1>
-            <p class="text-slate-500 font-medium">Theo dõi thời hạn và quản lý tệp tin pháp lý</p>
-        </div>
-        <div class="flex items-center gap-3">
-            <div class="px-4 py-2 bg-white border border-slate-200 rounded-xl shadow-sm text-sm font-bold text-slate-600">
-                Tổng số: {{ $contracts->count() }}
-            </div>
-        </div>
+        <p class="text-slate-500 text-sm">
+            Hợp đồng #{{ $contract->id }}
+            @if($contract->room)
+                — Phòng: <b>{{ $contract->room->room_code }}</b>
+            @endif
+        </p>
     </div>
 
-    {{-- Table Section --}}
-    <div class="table-container">
-        <table class="w-full text-left border-collapse">
-            <thead>
-                <tr class="bg-slate-50/80 border-b border-slate-100 text-[11px] uppercase tracking-widest text-slate-400 font-black">
-                    <th class="px-6 py-5">Mã Phòng</th>
-                    <th class="px-6 py-5">Hiệu lực hợp đồng</th>
-                    <th class="px-6 py-5 text-center">Trạng thái</th>
-                    <th class="px-6 py-5 text-center">Tệp đính kèm</th>
-                    <th class="px-6 py-5 text-right">Thao tác</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-slate-100">
-                @forelse($contracts as $c)
-                <tr class="hover:bg-slate-50/40 transition-all duration-200 group">
-                    <td class="px-6 py-4">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600 font-bold">
-                                {{ substr($c->room?->room_code ?? 'R', 0, 1) }}
-                            </div>
-                            <span class="font-bold text-slate-700">{{ $c->room?->room_code ?? ('ID: '.$c->room_id) }}</span>
-                        </div>
-                    </td>
-                    <td class="px-6 py-4">
-                        <div class="text-sm font-medium text-slate-600">
-                            {{ \Carbon\Carbon::parse($c->start_date)->format('d/m/Y') }} 
-                            <span class="mx-2 text-slate-300">→</span>
-                            <span class="{{ $c->status == 'expired' ? 'text-rose-500' : 'text-indigo-600 font-bold' }}">
-                                {{ $c->end_date ? \Carbon\Carbon::parse($c->end_date)->format('d/m/Y') : 'Vô thời hạn' }}
-                            </span>
-                        </div>
-                    </td>
-                    <td class="px-6 py-4 text-center">
-                        @php
-                            $statusClasses = [
-                                'active' => 'bg-emerald-100 text-emerald-700 border-emerald-200',
-                                'expired' => 'bg-rose-100 text-rose-700 border-rose-200',
-                                'cancelled' => 'bg-slate-100 text-slate-500 border-slate-200'
-                            ];
-                            $statusLabel = ['active' => 'Đang chạy', 'expired' => 'Hết hạn', 'cancelled' => 'Đã hủy'];
-                        @endphp
-                        <span class="px-3 py-1 rounded-full text-[10px] font-black uppercase border {{ $statusClasses[$c->status] ?? $statusClasses['cancelled'] }}">
-                            {{ $statusLabel[$c->status] ?? 'Không rõ' }}
-                        </span>
-                    </td>
-                    <td class="px-6 py-4 text-center">
-                        @if($c->contract_file)
-                            <a href="{{ route('tenant.contracts.view', $c->id) }}" target="_blank" 
-                               class="inline-flex items-center text-indigo-600 hover:text-indigo-800 transition-colors">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                            </a>
-                        @else
-                            <span class="text-slate-300 italic text-xs underline decoration-dotted">Chưa có file</span>
-                        @endif
-                    </td>
-                    <td class="px-6 py-4 text-right">
-                        @if(in_array($c->status, ['active', 'expired']))
-                        <button @click="
-                            openRenew = true;
-                            renewId = {{ $c->id }};
-                            roomCode = '{{ $c->room?->room_code }}';
-                            oldEndDate = '{{ $c->end_date }}';
-                            newEndDate = '';
-                            isLoading = false;
-                        " class="px-5 py-2 bg-white border-2 border-indigo-600 text-indigo-600 rounded-xl text-xs font-black hover:bg-indigo-600 hover:text-white transition-all shadow-sm active:scale-90">
-                            GIA HẠN
-                        </button>
-                        @endif
-                    </td>
-                </tr>
-                @empty
-                <tr>
-                    <td colspan="5" class="px-6 py-20 text-center">
-                        <p class="text-slate-400 font-medium tracking-tight">Bạn hiện chưa có dữ liệu hợp đồng nào.</p>
-                    </td>
-                </tr>
-                @endforelse
-            </tbody>
-        </table>
-    </div>
+    <div class="bg-white rounded-[2rem] shadow-xl border border-slate-100 form-card">
+        <div class="p-8 md:p-10">
 
-    {{-- MODAL GIA HẠN --}}
-    <div x-show="openRenew"
-         x-cloak
-         x-transition:enter="transition ease-out duration-300"
-         x-transition:enter-start="opacity-0"
-         x-transition:enter-end="opacity-100"
-         x-transition:leave="transition ease-in duration-200"
-         x-transition:leave-start="opacity-100"
-         x-transition:leave-end="opacity-0"
-         class="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-black/40">
-
-        <div class="bg-white w-full max-w-2xl rounded-xl shadow-2xl overflow-hidden max-h-[95vh] flex flex-col"
-             @click.away="openRenew = false">
-
-            {{-- Header sticky --}}
-            <div class="p-6 border-b flex items-center justify-between bg-white sticky top-0 z-10">
-                <div>
-                    <h2 class="text-xl font-black text-slate-900">Gia hạn hợp đồng</h2>
-                    <p class="text-slate-400 text-xs font-bold uppercase tracking-tight">
-                        Phòng <span class="text-indigo-600" x-text="roomCode"></span>
-                    </p>
+            @if(session('success'))
+                <div class="mb-6 px-5 py-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-700 font-bold text-sm">
+                    ✓ {{ session('success') }}
                 </div>
-                <button type="button"
-                        @click="openRenew = false"
-                        class="text-slate-400 hover:text-rose-500 font-black text-xl transition-colors">
-                    ✕
-                </button>
-            </div>
+            @endif
 
-            {{-- Body scroll --}}
-            <div class="p-6 overflow-y-auto modal-scroll">
-                <form :action="`{{ url('tenant/contracts') }}/${renewId}/renew`"
-                      method="POST"
-                      class="space-y-5"
-                      @submit="isLoading = true">
-                    @csrf
+            @if($errors->any())
+                <div class="mb-6 px-5 py-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-sm">
+                    <div class="mb-2 font-bold">Vui lòng kiểm tra lại:</div>
+                    <ul class="list-disc ml-5 space-y-1 font-semibold">
+                        @foreach($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label class="text-xs font-bold text-slate-500 mb-1 block">Mã phòng</label>
-                            <input type="text"
-                                   :value="roomCode"
-                                   readonly
-                                   class="w-full p-3 bg-slate-100 rounded-xl font-bold text-slate-700 border border-transparent">
-                        </div>
+            <form method="POST"
+                  action="{{ route('admin.contracts.update', $contract->id) }}"
+                  enctype="multipart/form-data"
+                  class="space-y-8">
+                @csrf
+                @method('PUT')
 
-                        <div>
-                            <label class="text-xs font-bold text-slate-500 mb-1 block">Hạn hiện tại</label>
-                            <input type="text"
-                                   :value="oldEndDate ? new Date(oldEndDate).toLocaleDateString('vi-VN') : ''"
-                                   readonly
-                                   class="w-full p-3 bg-slate-100 rounded-xl font-bold text-slate-700 border border-transparent">
-                        </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="text-xs font-bold text-slate-400 uppercase">
+                            Phòng
+                        </label>
+
+                        <select name="room_id"
+                                required
+                                class="w-full px-5 py-4 border-2 rounded-2xl font-bold outline-none focus-ring {{ $errors->has('room_id') ? 'border-rose-500 bg-rose-50' : 'border-slate-200' }}">
+                            <option value="">-- Chọn phòng --</option>
+                            @foreach($rooms as $room)
+                                <option value="{{ $room->id }}" {{ old('room_id', $contract->room_id) == $room->id ? 'selected' : '' }}>
+                                    {{ $room->room_code }}
+                                </option>
+                            @endforeach
+                        </select>
+
+                        @error('room_id')
+                            <p class="mt-2 text-sm font-semibold text-rose-600">{{ $message }}</p>
+                        @enderror
                     </div>
 
                     <div>
-                        <label class="text-xs font-bold text-slate-500 mb-1 block">Ngày hết hạn mới</label>
+                        <label class="text-xs font-bold text-slate-400 uppercase">
+                            Trạng thái
+                        </label>
+
+                        <select name="status"
+                                class="w-full px-5 py-4 border-2 rounded-2xl font-bold outline-none focus-ring {{ $errors->has('status') ? 'border-rose-500 bg-rose-50' : 'border-slate-200' }}">
+                            <option value="active" {{ old('status', $contract->status) == 'active' ? 'selected' : '' }}>Đang hiệu lực</option>
+                            <option value="expired" {{ old('status', $contract->status) == 'expired' ? 'selected' : '' }}>Hết hạn</option>
+                            <option value="cancelled" {{ old('status', $contract->status) == 'cancelled' ? 'selected' : '' }}>Đã hủy</option>
+                        </select>
+
+                        @error('status')
+                            <p class="mt-2 text-sm font-semibold text-rose-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div>
+                        <label class="text-xs font-bold text-slate-400 uppercase">
+                            Ngày bắt đầu
+                        </label>
+
+                        <input type="date"
+                               name="start_date"
+                               value="{{ old('start_date', optional($contract->start_date)->format('Y-m-d') ?? \Carbon\Carbon::parse($contract->start_date)->format('Y-m-d')) }}"
+                               required
+                               class="w-full px-5 py-4 border-2 rounded-2xl font-bold outline-none focus-ring {{ $errors->has('start_date') ? 'border-rose-500 bg-rose-50' : 'border-slate-200' }}">
+
+                        @error('start_date')
+                            <p class="mt-2 text-sm font-semibold text-rose-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div>
+                        <label class="text-xs font-bold text-slate-400 uppercase">
+                            Ngày kết thúc
+                        </label>
+
                         <input type="date"
                                name="end_date"
-                               x-model="newEndDate"
-                               :min="oldEndDate"
-                               required
-                               class="w-full p-3 bg-slate-50 rounded-xl font-bold text-slate-700 border border-transparent focus:border-indigo-500 outline-none transition-all">
+                               value="{{ old('end_date', $contract->end_date ? \Carbon\Carbon::parse($contract->end_date)->format('Y-m-d') : '') }}"
+                               class="w-full px-5 py-4 border-2 rounded-2xl font-bold outline-none focus-ring {{ $errors->has('end_date') ? 'border-rose-500 bg-rose-50' : 'border-slate-200' }}">
+
+                        @error('end_date')
+                            <p class="mt-2 text-sm font-semibold text-rose-600">{{ $message }}</p>
+                        @enderror
                     </div>
 
-                    <div x-show="isValidDate()" x-cloak class="p-4 bg-slate-50 rounded-xl border border-slate-200">
-                        <div class="flex items-center justify-between">
-                            <p class="text-sm font-medium text-slate-600">Thời gian gia hạn thêm</p>
-                            <p class="text-sm font-black text-indigo-600" x-text="diffDays() + ' ngày'"></p>
+                    <div class="md:col-span-2">
+                        <label class="text-xs font-bold text-slate-400 uppercase">
+                            Ghi chú hợp đồng
+                        </label>
+
+                        <textarea name="note"
+                                  rows="4"
+                                  class="w-full px-5 py-4 border-2 rounded-2xl font-bold outline-none focus-ring {{ $errors->has('note') ? 'border-rose-500 bg-rose-50' : 'border-slate-200' }}"
+                                  placeholder="Nhập ghi chú thêm nếu có...">{{ old('note', $contract->note) }}</textarea>
+
+                        @error('note')
+                            <p class="mt-2 text-sm font-semibold text-rose-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+                </div>
+
+                <div class="border-t pt-8">
+                    <h3 class="text-sm font-black text-slate-700 uppercase tracking-wider mb-4">
+                        Thông tin dịch vụ
+                    </h3>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="text-xs font-bold text-slate-400 uppercase">
+                                Tiền điện
+                            </label>
+
+                            <input type="number"
+                                   step="0.01"
+                                   name="electric_price"
+                                   value="{{ old('electric_price', $contract->electric_price) }}"
+                                   class="w-full px-5 py-4 border-2 rounded-2xl font-bold outline-none focus-ring {{ $errors->has('electric_price') ? 'border-rose-500 bg-rose-50' : 'border-slate-200' }}">
+
+                            @error('electric_price')
+                                <p class="mt-2 text-sm font-semibold text-rose-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <div>
+                            <label class="text-xs font-bold text-slate-400 uppercase">
+                                Tiền nước
+                            </label>
+
+                            <input type="number"
+                                   step="0.01"
+                                   name="water_price"
+                                   value="{{ old('water_price', $contract->water_price) }}"
+                                   class="w-full px-5 py-4 border-2 rounded-2xl font-bold outline-none focus-ring {{ $errors->has('water_price') ? 'border-rose-500 bg-rose-50' : 'border-slate-200' }}">
+
+                            @error('water_price')
+                                <p class="mt-2 text-sm font-semibold text-rose-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <div>
+                            <label class="text-xs font-bold text-slate-400 uppercase">
+                                Tiền wifi
+                            </label>
+
+                            <input type="number"
+                                   step="0.01"
+                                   name="wifi_price"
+                                   value="{{ old('wifi_price', $contract->wifi_price) }}"
+                                   class="w-full px-5 py-4 border-2 rounded-2xl font-bold outline-none focus-ring {{ $errors->has('wifi_price') ? 'border-rose-500 bg-rose-50' : 'border-slate-200' }}">
+
+                            @error('wifi_price')
+                                <p class="mt-2 text-sm font-semibold text-rose-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <div>
+                            <label class="text-xs font-bold text-slate-400 uppercase">
+                                Phí dịch vụ khác
+                            </label>
+
+                            <input type="number"
+                                   step="0.01"
+                                   name="service_price"
+                                   value="{{ old('service_price', $contract->service_price) }}"
+                                   class="w-full px-5 py-4 border-2 rounded-2xl font-bold outline-none focus-ring {{ $errors->has('service_price') ? 'border-rose-500 bg-rose-50' : 'border-slate-200' }}">
+
+                            @error('service_price')
+                                <p class="mt-2 text-sm font-semibold text-rose-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <div class="md:col-span-2">
+                            <label class="text-xs font-bold text-slate-400 uppercase">
+                                Diễn giải dịch vụ
+                            </label>
+
+                            <textarea name="service_note"
+                                      rows="3"
+                                      class="w-full px-5 py-4 border-2 rounded-2xl font-bold outline-none focus-ring {{ $errors->has('service_note') ? 'border-rose-500 bg-rose-50' : 'border-slate-200' }}"
+                                      placeholder="Wifi, rác, gửi xe...">{{ old('service_note', $contract->service_note) }}</textarea>
+
+                            @error('service_note')
+                                <p class="mt-2 text-sm font-semibold text-rose-600">{{ $message }}</p>
+                            @enderror
                         </div>
                     </div>
+                </div>
 
-                    <div x-show="newEndDate && !isValidDate()" x-cloak class="p-4 bg-rose-50 rounded-xl border border-rose-200">
-                        <p class="text-sm font-bold text-rose-600">
-                            Ngày hết hạn mới phải lớn hơn ngày hết hạn hiện tại.
-                        </p>
+                <div class="border-t pt-8 space-y-4">
+                    <div>
+                        <label class="text-xs font-bold text-slate-400 uppercase">
+                            File hợp đồng hiện tại
+                        </label>
+
+                        @if($contract->contract_file)
+                            <div class="mt-2">
+                                <a href="{{ asset('storage/' . $contract->contract_file) }}"
+                                   target="_blank"
+                                   class="inline-flex items-center gap-2 text-indigo-600 hover:text-indigo-800 font-bold text-sm">
+                                    Xem file hiện tại
+                                </a>
+                            </div>
+                        @else
+                            <p class="mt-2 text-sm font-bold text-slate-400">Chưa có file hợp đồng</p>
+                        @endif
                     </div>
 
-                    {{-- Footer sticky --}}
-                    <div class="flex gap-3 pt-6 border-t border-slate-100 sticky bottom-0 bg-white">
-                        <button type="submit"
-                                :disabled="!isValidDate() || isLoading"
-                                class="flex-1 bg-slate-900 text-white py-3.5 rounded-xl font-black uppercase tracking-widest text-sm hover:bg-indigo-600 transition-all shadow-lg shadow-indigo-100 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
-                            <template x-if="isLoading">
-                                <svg class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
-                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                </svg>
-                            </template>
-                            <span x-text="isLoading ? 'Đang xử lý...' : 'Xác nhận gia hạn'"></span>
-                        </button>
+                    <div>
+                        <label class="text-xs font-bold text-slate-400 uppercase">
+                            Tải file hợp đồng mới
+                        </label>
 
-                        <button type="button"
-                                @click="openRenew = false"
-                                class="px-8 text-slate-400 font-bold hover:text-slate-600">
-                            Hủy
-                        </button>
+                        <input type="file"
+                               name="contract_file"
+                               accept=".pdf,.doc,.docx,image/*"
+                               class="w-full px-5 py-3 bg-slate-50 border-2 border-slate-100 rounded-2xl font-bold text-slate-700 outline-none focus-ring">
+
+                        @error('contract_file')
+                            <p class="mt-2 text-sm font-semibold text-rose-600">{{ $message }}</p>
+                        @enderror
                     </div>
-                </form>
-            </div>
+                </div>
+
+                <div class="flex justify-end gap-4 pt-8 border-t">
+                    <a href="{{ route('admin.contracts.index') }}"
+                       class="px-8 py-4 text-slate-400 font-bold hover:text-slate-600 transition">
+                        Hủy bỏ
+                    </a>
+
+                    <button type="submit"
+                            class="px-10 py-4 bg-slate-900 text-white rounded-2xl font-black hover:bg-indigo-600 transition">
+                        Cập nhật hợp đồng
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </div>

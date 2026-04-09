@@ -9,18 +9,29 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
 
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+        }
 
         .focus-ring:focus {
-            box-shadow: 0 0 0 4px rgba(99,102,241,.1);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, .1);
             border-color: #6366f1;
         }
-        .form-card { animation: slideUp .5s ease-out; }
 
-        .form-card { animation: slideUp .5s ease-out; }
+        .form-card {
+            animation: slideUp .5s ease-out;
+        }
+
         @keyframes slideUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         input[type="file"]::file-selector-button {
@@ -35,21 +46,17 @@
         }
     </style>
 </head>
-
 <body class="p-6 md:p-12">
 
-<div class="max-w-3xl mx-auto">
-
-    {{-- Header --}}
 @php
     $assetNames = $room->assets?->pluck('name')->toArray() ?? [];
     $selectedAssets = old('assets', $assetNames);
-
     $deleteImageIds = old('delete_image_ids', []);
+
+    $list = ['Điều hòa', 'Nóng lạnh', 'Wifi', 'Giường', 'Tủ lạnh', 'Máy giặt'];
 @endphp
 
 <div class="max-w-3xl mx-auto">
-
     <div class="mb-10">
         <a href="{{ route('admin.rooms.index') }}"
            class="inline-flex items-center gap-2 text-slate-400 hover:text-indigo-600 font-bold text-sm">
@@ -62,19 +69,6 @@
 
         <p class="text-slate-500 text-sm">
             Mã phòng: <b>#{{ $room->room_code }}</b> — ID: {{ $room->id }}
-        </p>
-    </div>
-
-    {{-- Card --}}
-    <div class="bg-white rounded-[2.5rem] shadow-xl border border-slate-100 form-card">
-        <div class="p-8 md:p-12">
-
-            {{-- Errors --}}
-            @if($errors->any())
-                <div class="mb-6 p-4 rounded-2xl bg-rose-50 text-rose-700 font-bold text-sm">
-                    <div class="mb-2">Vui lòng kiểm tra lại:</div>
-                    <ul class="list-disc ml-5 font-semibold">
-            Mã phòng hiện tại: <b>#{{ $room->room_code }}</b> — ID: {{ $room->id }}
         </p>
     </div>
 
@@ -93,17 +87,13 @@
             @endif
 
             <form method="POST"
-                  action="{{ route('admin.rooms.update',$room->id) }}"
                   action="{{ route('admin.rooms.update', $room->id) }}"
                   enctype="multipart/form-data"
                   class="space-y-8">
-
                 @csrf
                 @method('PUT')
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-
-                    {{-- Mã phòng --}}
                     <div>
                         <label class="text-xs font-bold text-slate-400 uppercase">
                             Mã phòng
@@ -111,12 +101,6 @@
 
                         <input type="text"
                                name="room_code"
-                               value="{{ old('room_code',$room->room_code) }}"
-                               required
-                               class="w-full px-6 py-4 border-2 rounded-2xl font-bold focus-ring outline-none">
-                    </div>
-
-                    {{-- Tòa nhà --}}
                                value="{{ old('room_code', $room->room_code) }}"
                                required
                                class="w-full px-6 py-4 border-2 rounded-2xl font-bold outline-none focus-ring {{ $errors->has('room_code') ? 'border-rose-500 bg-rose-50' : 'border-slate-200' }}">
@@ -133,11 +117,6 @@
 
                         <select name="building_id"
                                 required
-                                class="w-full px-6 py-4 border-2 rounded-2xl font-bold focus-ring outline-none">
-                            <option value="">-- Chọn tòa nhà --</option>
-                            @foreach($buildings as $b)
-                                <option value="{{ $b->id }}"
-                                    {{ (old('building_id',$room->building_id)==$b->id) ? 'selected' : '' }}>
                                 class="w-full px-6 py-4 border-2 rounded-2xl font-bold outline-none focus-ring {{ $errors->has('building_id') ? 'border-rose-500 bg-rose-50' : 'border-slate-200' }}">
                             <option value="">-- Chọn tòa nhà --</option>
                             @foreach($buildings as $b)
@@ -146,9 +125,6 @@
                                 </option>
                             @endforeach
                         </select>
-                    </div>
-
-                    {{-- Giá --}}
 
                         @error('building_id')
                             <p class="mt-2 text-sm font-semibold text-rose-600">{{ $message }}</p>
@@ -162,12 +138,6 @@
 
                         <input type="number"
                                name="price"
-                               value="{{ old('price',$room->price) }}"
-                               required min="0"
-                               class="w-full px-6 py-4 border-2 rounded-2xl font-bold focus-ring outline-none">
-                    </div>
-
-                    {{-- Diện tích --}}
                                value="{{ old('price', $room->price) }}"
                                required
                                min="0"
@@ -186,11 +156,6 @@
                         <input type="number"
                                step="0.1"
                                name="area"
-                               value="{{ old('area',$room->area) }}"
-                               min="0"
-                               class="w-full px-6 py-4 border-2 rounded-2xl font-bold focus-ring outline-none">
-                    </div>
-
                                value="{{ old('area', $room->area) }}"
                                min="0"
                                class="w-full px-6 py-4 border-2 rounded-2xl font-bold outline-none focus-ring {{ $errors->has('area') ? 'border-rose-500 bg-rose-50' : 'border-slate-200' }}">
@@ -207,12 +172,6 @@
 
                         <input type="number"
                                name="max_people"
-                               value="{{ old('max_people',$room->max_people) }}"
-                               min="1"
-                               class="w-full px-6 py-4 border-2 rounded-2xl font-bold focus-ring outline-none">
-                    </div>
-
-                    {{-- Tầng --}}
                                value="{{ old('max_people', $room->max_people) }}"
                                min="1"
                                class="w-full px-6 py-4 border-2 rounded-2xl font-bold outline-none focus-ring {{ $errors->has('max_people') ? 'border-rose-500 bg-rose-50' : 'border-slate-200' }}">
@@ -229,12 +188,6 @@
 
                         <input type="number"
                                name="floor"
-                               value="{{ old('floor',$room->floor) }}"
-                               min="0"
-                               class="w-full px-6 py-4 border-2 rounded-2xl font-bold focus-ring outline-none">
-                    </div>
-
-                    {{-- Trạng thái --}}
                                value="{{ old('floor', $room->floor) }}"
                                min="0"
                                class="w-full px-6 py-4 border-2 rounded-2xl font-bold outline-none focus-ring {{ $errors->has('floor') ? 'border-rose-500 bg-rose-50' : 'border-slate-200' }}">
@@ -250,25 +203,6 @@
                         </label>
 
                         <select name="status"
-                                class="w-full px-6 py-4 border-2 rounded-2xl font-bold focus-ring outline-none">
-                            <option value="empty" {{ old('status',$room->status)=='empty'?'selected':'' }}>
-                                Phòng trống
-                            </option>
-                            <option value="occupied" {{ old('status',$room->status)=='occupied'?'selected':'' }}>
-                                Đang thuê
-                            </option>
-                            <option value="maintenance" {{ old('status',$room->status)=='maintenance'?'selected':'' }}>
-                                Đang bảo trì
-                            </option>
-                        </select>
-                    </div>
-                </div>
-
-                {{-- Tiện nghi (assets) --}}
-                @php
-                    $assetNames = $room->assets?->pluck('name')->toArray() ?? [];
-                @endphp
-
                                 class="w-full px-6 py-4 border-2 rounded-2xl font-bold outline-none focus-ring {{ $errors->has('status') ? 'border-rose-500 bg-rose-50' : 'border-slate-200' }}">
                             <option value="empty" {{ old('status', $room->status) == 'empty' ? 'selected' : '' }}>
                                 Phòng trống
@@ -287,22 +221,13 @@
                     </div>
                 </div>
 
-                {{-- TIỆN NGHI --}}
                 <div class="space-y-3">
                     <label class="text-xs font-bold text-slate-400 uppercase">
                         Tiện nghi phòng
                     </label>
-                    <div class="grid grid-cols-2 md:grid-cols-3 gap-3 text-sm font-bold text-slate-600">
-                    <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
-                        @php
-                            $list = ['Điều hòa','Nóng lạnh','Wifi','Giường','Tủ lạnh','Máy giặt'];
-                        @endphp
 
-                        @foreach($list as $item
-                            <label class="flex items-center gap-2">
-                                <input type="checkbox" name="assets[]" value="{{ $item }}"
-                                    {{ in_array($item, old('assets',$assetNames)) ? 'checked' : '' }}>
-                                {{ $item }}
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                        @foreach($list as $item)
                             <label class="flex items-center gap-3 px-4 py-3 rounded-2xl border border-slate-200 bg-slate-50 hover:bg-indigo-50 hover:border-indigo-200 transition cursor-pointer">
                                 <input type="checkbox"
                                        name="assets[]"
@@ -314,30 +239,19 @@
                         @endforeach
                     </div>
                 </div>
-                {{-- Ảnh hiện có --}}
-                {{-- ẢNH HIỆN CÓ --}}
+
                 <div class="space-y-3">
                     <label class="text-xs font-bold text-slate-400 uppercase">
                         Ảnh hiện có
                     </label>
 
-                    @if($room->images && $room->images->count()
-                        <div class="grid grid-cols-3 md:grid-cols-4 gap-3">
-                            @foreach($room->images as $img)
-                                <a href="{{ asset('storage/'.$img->image_path) }}" target="_blank"
-                                   class="block overflow-hidden rounded-2xl border bg-slate-50">
-                                    <img src="{{ asset('storage/'.$img->image_path) }}"
-                                         class="w-full h-24 object-cover hover:scale-105 transition-transform">
-                                </a>
-                            @endforeach
-                        </div>
-                        <p class="text-[11px] text-slate-400 font-semibold">
-                            * Hiện tại trang edit này chỉ “thêm ảnh mới”, chưa xóa ảnh cũ.
+                    @if($room->images && $room->images->count())
                         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                             @foreach($room->images as $img)
                                 <div class="rounded-2xl border border-slate-200 bg-white overflow-hidden">
-                                    <a href="{{ asset('storage/'.$img->image_path) }}" target="_blank" class="block">
-                                        <img src="{{ asset('storage/'.$img->image_path) }}"
+                                    <a href="{{ asset('storage/' . $img->image_path) }}" target="_blank" class="block">
+                                        <img src="{{ asset('storage/' . $img->image_path) }}"
+                                             alt="Ảnh phòng"
                                              class="w-full h-28 object-cover hover:scale-105 transition-transform">
                                     </a>
 
@@ -360,17 +274,12 @@
                         <p class="text-slate-400 font-bold text-sm">Chưa có ảnh</p>
                     @endif
                 </div>
-                {{-- Upload ảnh mới --}}
-                {{-- THÊM ẢNH MỚI --}}
+
                 <div class="space-y-2">
                     <label class="text-xs font-bold text-slate-400 uppercase">
                         Thêm ảnh mới
                     </label>
-                    <input type="file" name="images[]" multiple accept="image/*"
-                           class="w-full px-6 py-3 bg-slate-50 border-2 border-slate-100 rounded-2xl font-bold text-slate-700 focus-ring outline-none">
-                </div>
 
-                {{-- Mô tả --}}
                     <input type="file"
                            name="images[]"
                            multiple
@@ -391,11 +300,6 @@
                         Mô tả
                     </label>
 
-                    <textarea name="description" rows="4"
-                              class="w-full px-6 py-4 border-2 rounded-2xl font-bold focus-ring outline-none">{{ old('description',$room->description) }}</textarea>
-                </div>
-
-                {{-- Buttons --}}
                     <textarea name="description"
                               rows="4"
                               class="w-full px-6 py-4 border-2 rounded-2xl font-bold outline-none focus-ring {{ $errors->has('description') ? 'border-rose-500 bg-rose-50' : 'border-slate-200' }}">{{ old('description', $room->description) }}</textarea>
@@ -416,11 +320,8 @@
                         Lưu
                     </button>
                 </div>
-
             </form>
 
-        </div>
-    </div>
         </div>
     </div>
 </div>
